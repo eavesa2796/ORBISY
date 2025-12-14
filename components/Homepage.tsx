@@ -240,10 +240,11 @@ export default function Homepage() {
             <Image
               src="/orbisy-logo.png"
               alt="ORBISY"
-              width={140}
-              height={44}
+              width={260}
+              height={80}
               priority
-              className="h-10 w-auto"
+              // className="h-10 w-auto"
+              className="mx-auto h-20 w-auto md:h-34"
             />
           </a>
 
