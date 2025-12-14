@@ -244,7 +244,7 @@ export default function Homepage() {
               height={80}
               priority
               // className="h-10 w-auto"
-              className="mx-auto h-20 w-auto md:h-34"
+              className="mx-auto h-20 w-auto sm:h-34"
             />
           </a>
 
