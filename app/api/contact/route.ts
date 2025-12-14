@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     // IMPORTANT:
     // - For production, use a verified domain and set `from` to something like: "Your Name <hello@yourdomain.com>"
     // - For quick testing, you can use Resend's onboarding/sandbox options depending on your account setup.
-    const from = process.env.CONTACT_FROM ?? "onboarding@resend.dev";
+    const from = process.env.CONTACT_FROM ?? "anthonyeaves33@gmail.com";
     const to = (process.env.CONTACT_TO ?? "")
       .split(",")
       .map((s) => s.trim())
