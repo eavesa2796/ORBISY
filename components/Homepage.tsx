@@ -593,14 +593,14 @@ export default function Homepage() {
                             Email:{" "}
                             <a
                               className="text-[color:var(--accent)]"
-                              href="mailto:hello@example.com"
+                              href="mailto:anthonyeaves33@gmail.com"
                             >
-                              hello@example.com
+                              AnthonyEaves33@gmail.com
                             </a>
                             <br />
                             Phone:{" "}
                             <span className="text-[color:var(--muted)]">
-                              (555) 123-4567
+                              (331) 703-4585
                             </span>
                           </p>
                         </div>
@@ -643,8 +643,7 @@ export default function Homepage() {
           </div>
 
           <footer className="p-6 text-center text-[color:var(--muted)]">
-            © {new Date().getFullYear()} Your Studio Name. Replace placeholders
-            with your real offer & contact info.
+            © {new Date().getFullYear()} ORBISY. All Rights Reserved.
           </footer>
         </div>
       </main>
