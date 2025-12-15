@@ -233,7 +233,7 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen text-[color:var(--text)] antialiased bg-[linear-gradient(180deg,var(--bg),#0a0f1b_40%,#090d17)]">
-      <header className="mx-auto max-w-[1100px] px-5 pb-5 pt-12 text-center">
+      <header className="mx-auto max-w-[1100px] px-5 pb-5 pt-2 text-center">
         <div className="mb-8 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 no-underline">
             <span className="sr-only">ORBISY</span>
