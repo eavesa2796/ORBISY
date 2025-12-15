@@ -1,19 +1,20 @@
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 
-export const runtime = "nodejs"; // keep this on Node runtime for email libs
+export const runtime = "nodejs";
 
 type Payload = {
   businessName?: string;
   email?: string;
   message?: string;
-  website?: string; // honeypot (spam trap)
+  website?: string; // honeypot
 };
 
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Payload;
 
-    // Basic anti-spam honeypot: real users won't fill this
+    // Honeypot (spam trap)
     if (body.website && body.website.trim().length > 0) {
       return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     const email = (body.email ?? "").trim();
     const message = (body.message ?? "").trim();
 
+    // ✅ Validation (keep this before DB/email)
     if (!email || !message) {
       return new Response(
         JSON.stringify({ ok: false, error: "Missing email or message." }),
@@ -29,11 +31,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // ✅ RIGHT HERE: Save to DB (before sending email)
+    await prisma.lead.create({
+      data: {
+        businessName: businessName || null,
+        email,
+        message,
+      },
+    });
+
+    // Then send email
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // IMPORTANT:
-    // - For production, use a verified domain and set `from` to something like: "Your Name <hello@yourdomain.com>"
-    // - For quick testing, you can use Resend's onboarding/sandbox options depending on your account setup.
     const from = process.env.CONTACT_FROM ?? "onboarding@resend.dev";
     const to = (process.env.CONTACT_TO ?? "")
       .split(",")
