@@ -238,7 +238,7 @@ export default function Homepage() {
           <a href="#" className="flex items-center gap-3 no-underline">
             <span className="sr-only">ORBISY</span>
             <Image
-              src="/orbisy-logo-4.png"
+              src="/orbisy-logo.png"
               alt="ORBISY"
               width={260}
               height={80}
