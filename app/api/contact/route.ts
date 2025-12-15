@@ -13,9 +13,11 @@ type Payload = {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Payload;
+    console.log("📥 Received form submission:", body);
 
     // Honeypot (spam trap)
     if (body.website && body.website.trim().length > 0) {
+      console.log("🚫 Honeypot triggered - spam blocked");
       return new Response(JSON.stringify({ ok: true }), { status: 200 });
     }
 
@@ -25,6 +27,7 @@ export async function POST(req: Request) {
 
     // ✅ Validation (keep this before DB/email)
     if (!email || !message) {
+      console.log("❌ Validation failed - missing email or message");
       return new Response(
         JSON.stringify({ ok: false, error: "Missing email or message." }),
         { status: 400 }
@@ -32,13 +35,15 @@ export async function POST(req: Request) {
     }
 
     // ✅ RIGHT HERE: Save to DB (before sending email)
-    await prisma.lead.create({
+    console.log("💾 Attempting to save to database...");
+    const lead = await prisma.lead.create({
       data: {
         businessName: businessName || null,
         email,
         message,
       },
     });
+    console.log("✅ Lead saved to database:", lead);
 
     // Then send email
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -78,6 +83,7 @@ export async function POST(req: Request) {
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (err) {
+    console.error("💥 Error in contact API:", err);
     return new Response(JSON.stringify({ ok: false, error: "Server error" }), {
       status: 500,
     });
