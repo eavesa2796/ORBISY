@@ -593,9 +593,9 @@ export default function Homepage() {
                             Email:{" "}
                             <a
                               className="text-[color:var(--accent)]"
-                              href="mailto:anthonyeaves33@gmail.com"
+                              href="mailto:info@orbisy.com"
                             >
-                              AnthonyEaves33@gmail.com
+                              info@orbisy.com
                             </a>
                             <br />
                             Phone:{" "}
