@@ -298,7 +298,7 @@ export default function Homepage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <div>
+          <div className="flex flex-wrap gap-2">
             {[
               "Plumbers",
               "HVAC",
