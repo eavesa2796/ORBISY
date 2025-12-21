@@ -316,7 +316,7 @@ export default function Homepage() {
         </div>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <a
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
+            className="d-none inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
             href="#book"
           >
             Book a Free Lead Audit <span aria-hidden>→</span>
