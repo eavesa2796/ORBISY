@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import CalendlyButton from "@/components/CalendlyButton";
 import Image from "next/image";
 
 type Service = {
@@ -259,12 +260,9 @@ export default function Homepage() {
             >
               Services
             </a>
-            <a
-              href="#book"
-              className="rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]"
-            >
+            <CalendlyButton className="rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
               Book Audit
-            </a>
+            </CalendlyButton>
           </div>
         </div>
 
@@ -283,12 +281,9 @@ export default function Homepage() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <a
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
-            href="#book"
-          >
-            Book a Free Lead Audit <span aria-hidden>→</span>
-          </a>
+          <CalendlyButton className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]">
+            Book a Free Lead Audit →
+          </CalendlyButton>
           <a
             className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] bg-transparent text-[color:var(--text)]"
             href="#work"
