@@ -297,8 +297,9 @@ export default function Homepage() {
           </a>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <div>
+        <div className="mt-6 flex flex-col items-center justify-center gap-3">
+          {/* Chips */}
+          <div className="flex flex-wrap items-center justify-center gap-2 px-2">
             {[
               "Plumbers",
               "HVAC",
@@ -315,12 +316,12 @@ export default function Homepage() {
               </span>
             ))}
           </div>
-          <div className="w-full">
-            <p className="mt-3 text-sm text-[color:var(--muted)]">
-              Most Lead Follow-Up Fix setups start at{" "}
-              <strong>$750 one-time</strong>.
-            </p>
-          </div>
+
+          {/* Pricing line */}
+          <p className="text-center text-sm text-[color:var(--muted)]">
+            Most Lead Follow-Up Fix setups start at{" "}
+            <strong>$750 one-time</strong>.
+          </p>
         </div>
       </header>
 
