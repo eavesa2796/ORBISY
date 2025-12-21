@@ -19,144 +19,139 @@ type Service = {
 const services: Service[] = [
   {
     id: "automation",
-    tab: "Lead Follow-Up & Automations",
-    kicker: "Stop losing leads",
-    title: "Instant replies + reminders so every lead gets handled",
-    sub: "Local businesses lose customers when leads sit too long. We set up simple automations that respond immediately, notify your team, and keep follow-ups from slipping through the cracks.",
-    chips: [
-      "Website forms",
-      "Instagram DMs",
-      "Email/SMS alerts",
-      "Zapier/Make",
-    ],
+    tab: "Automation & Integrations",
+    kicker: "Make busywork disappear",
+    title: "Automations that save hours every week",
+    sub: "We connect the tools you already use so your team spends less time copying/pasting and more time serving customers.",
+    chips: ["Zapier/Make", "Google Workspace", "QuickBooks", "POS/CRM"],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
-      { label: "See How It Works", href: "#workflows", variant: "ghost" },
+      { label: "Book a Free Audit", href: "#book", variant: "primary" },
+      { label: "See Example Workflows", href: "#workflows", variant: "ghost" },
     ],
     highlights: [
       {
-        title: "What we automate first",
+        title: "Common wins",
         bullets: [
-          "Instant auto-reply to new leads (so they don’t bounce)",
-          "Owner alerts when a lead comes in",
-          "Follow-up reminders until the lead is contacted",
+          "Auto-send invoices & payment reminders",
+          "Sync leads from forms → CRM",
+          "Daily sales & inventory alerts",
         ],
       },
       {
-        title: "Built for local reality",
+        title: "Fast turnaround",
         bullets: [
-          "Works with what you already use",
-          "No complicated “software rollout”",
-          "Clear documentation so you’re not dependent on us",
+          "1–3 days for simple automations",
+          "1–2 weeks for multi-system builds",
+          "We document everything for handoff",
         ],
       },
     ],
     table: {
-      title: "72-hour lead fix (typical)",
+      title: "Sample workflow plan",
       rows: [
-        ["Day 1", "Audit lead sources + map follow-up flow", "You + me"],
-        ["Day 2", "Build automations + notifications + tracking", "Me"],
-        ["Day 3", "Test, tune messaging, go-live", "You + me"],
+        ["Day 1", "Audit + map data flow", "You + me"],
+        ["Day 2", "Build automation + logging", "Me"],
+        ["Day 3", "Test, train staff, go-live", "You + me"],
       ],
     },
     cards3: [
       {
         title: "What you get",
-        text: "A lead follow-up system that responds fast, keeps your team accountable, and prevents missed opportunities.",
+        text: "Reliable automations with error handling, alerts, and a simple dashboard so you’re not guessing if it worked.",
       },
       {
         title: "Best for",
-        text: "Local service businesses where speed-to-lead matters (calls, website forms, IG).",
+        text: "Businesses juggling 3+ tools, manual data entry, and recurring admin tasks.",
       },
       {
-        title: "Typical outcome",
-        text: "More booked jobs without spending more on ads—because you stop leaking leads.",
+        title: "Pricing idea",
+        text: "Fixed-fee build + optional monthly monitoring. Clear scope, no surprises.",
       },
     ],
   },
   {
     id: "websites",
     tab: "Websites & Lead Capture",
-    kicker: "Turn visitors into booked jobs",
-    title: "A fast homepage that converts—and routes leads correctly",
-    sub: "Most websites look fine but leak leads. We build a clean, mobile-first site with clear messaging, strong CTAs, and reliable lead routing so you can respond fast.",
-    chips: ["Next.js", "Local SEO basics", "Forms/Booking", "Analytics"],
+    kicker: "Turn visitors into customers",
+    title: "A fast website that brings in leads",
+    sub: "Modern, mobile-first sites with clear messaging, booking, contact forms, and analytics—built to convert, not just look pretty.",
+    chips: ["Next.js", "SEO", "Analytics", "Booking/Forms"],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
-      { label: "What’s Included", href: "#sections", variant: "ghost" },
+      { label: "Get a Homepage Mock", href: "#book", variant: "primary" },
+      { label: "View Sections", href: "#sections", variant: "ghost" },
     ],
     highlights: [
       {
         title: "Included",
         bullets: [
-          "Conversion-first homepage sections",
-          "Lead form routed to email/CRM + auto-reply",
+          "Homepage + service pages",
+          "Lead form routed to email/CRM",
           "Speed + basic SEO setup",
         ],
       },
       {
-        title: "Optional add-ons",
+        title: "Optional",
         bullets: [
           "Online booking",
-          "Reviews widget + social proof",
-          "Location/Service landing pages",
+          "Reviews widget",
+          "Local SEO landing pages",
         ],
       },
     ],
     table: {
-      title: "Homepage launch timeline (example)",
+      title: "Launch timeline (example)",
       rows: [
-        ["Week 1", "Copy + layout + approval", "Draft to final"],
-        ["Week 2", "Build + mobile QA", "Staging link"],
-        ["Week 3", "Go-live + tracking", "Post-launch tweaks"],
+        ["Week 1", "Copy + layout + design", "Draft to approval"],
+        ["Week 2", "Build + mobile + QA", "Staging link"],
+        ["Week 3", "Go live + analytics", "Post-launch tweaks"],
       ],
     },
     cards3: [
       {
         title: "What you get",
-        text: "A homepage designed to get calls/messages, not just look good—and a lead pipeline you can actually track.",
+        text: "A clean site with conversion-first sections, simple navigation, and a lead pipeline you can track.",
       },
       {
         title: "Best for",
-        text: "Trades and local services that win by responding faster than competitors.",
+        text: "Local services, clinics, trades, and any business that wins by responding faster.",
       },
       {
-        title: "Typical outcome",
-        text: "More inquiries convert to booked work because follow-up is automatic and consistent.",
+        title: "Pricing idea",
+        text: "One-time build + optional monthly hosting/updates. Keep ownership of your code.",
       },
     ],
   },
   {
     id: "ops",
     tab: "Dashboards & Ops Tools",
-    kicker: "Clarity for the day-to-day",
-    title: "Simple tools for scheduling, jobs, and visibility",
-    sub: "When operations live in texts and spreadsheets, things get missed. We build lightweight dashboards and internal tools that match how your team actually works.",
-    chips: ["Postgres", "Admin UI", "Exports", "Audit trails"],
+    kicker: "Know what’s happening",
+    title: "Simple internal tools your team actually uses",
+    sub: "Custom dashboards and lightweight apps for scheduling, job tracking, inventory, and reporting—built around how your business runs.",
+    chips: ["Postgres", "Admin UI", "Role-based access", "Exports"],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
-      { label: "See Example Tools", href: "#dashboard", variant: "ghost" },
+      { label: "Talk Through Your Process", href: "#book", variant: "primary" },
+      { label: "See Example Dashboard", href: "#dashboard", variant: "ghost" },
     ],
     highlights: [
       {
         title: "Common builds",
         bullets: [
-          "Job tracker (status, owner, next step)",
+          "Job tracker (status, owners, SLAs)",
           "Daily KPI dashboard",
           "Inventory + reorder alerts",
         ],
       },
       {
-        title: "Designed for adoption",
+        title: "Built for reality",
         bullets: [
           "Works on phones/tablets",
-          "Simple permissions",
-          "Documentation + training included",
+          "Exports to CSV",
+          "Permissions + audit logs",
         ],
       },
     ],
     table: {
-      title: "MVP build plan (example)",
+      title: "Example deliverables",
       rows: [
         ["Week 1", "Requirements + wireframes", "Screens + data model"],
         ["Week 2", "Build MVP", "Core flows working"],
@@ -166,21 +161,21 @@ const services: Service[] = [
     cards3: [
       {
         title: "What you get",
-        text: "A focused tool that matches your workflow so the team actually uses it (and stops improvising).",
+        text: "A focused tool that matches your workflows, with clear documentation and ongoing support if you want it.",
       },
       {
         title: "Best for",
-        text: "Businesses juggling jobs, schedules, and follow-ups across too many places.",
+        text: "Teams still running operations from paper, text threads, or messy spreadsheets.",
       },
       {
-        title: "Typical outcome",
-        text: "Fewer missed steps, faster handoffs, and clearer ownership—without enterprise complexity.",
+        title: "Pricing idea",
+        text: "Milestone-based with a clear MVP. Expand only if it’s paying for itself.",
       },
     ],
   },
 ];
 
-export default function Homepage() {
+export default function NotYet() {
   const [activeId, setActiveId] = useState<string>("automation");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState<null | "ok" | "error">(null);
@@ -248,7 +243,8 @@ export default function Homepage() {
               width={260}
               height={80}
               priority
-              className="mx-auto h-20 w-auto sm:h-24"
+              // className="h-10 w-auto"
+              className="mx-auto h-20 w-auto sm:h-34"
             />
           </a>
 
@@ -263,23 +259,21 @@ export default function Homepage() {
               href="#book"
               className="rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]"
             >
-              Book Audit
+              Contact
             </a>
           </div>
         </div>
 
         <div className="text-[color:var(--muted)] font-semibold tracking-[.12em] uppercase">
-          Built for Local Service Businesses
+          Software Services • Built for Small Businesses
         </div>
-
-        <h1 className="mt-2 text-[clamp(28px,4vw,44px)] leading-[1.1] font-extrabold">
-          Stop losing leads from your website & Instagram.
+        <h1 className="mt-2 text-[clamp(28px,4vw,42px)] leading-[1.15] font-extrabold">
+          We build the tools that keep your business running—without the
+          enterprise bloat.
         </h1>
-
-        <p className="mx-auto mt-3 max-w-[70ch] text-[color:var(--muted)]">
-          ORBISY helps local businesses capture every lead, respond instantly,
-          and track follow-ups so more inquiries turn into booked jobs—without
-          expensive software or complicated setups.
+        <p className="mx-auto mt-3 max-w-[60ch] text-[color:var(--muted)]">
+          Websites, automations, dashboards, and internal tools—delivered fast,
+          documented well, and priced clearly. Start with one high-impact win.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -287,7 +281,7 @@ export default function Homepage() {
             className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
             href="#book"
           >
-            Book a Free Lead Audit <span aria-hidden>→</span>
+            Book a Free Audit <span aria-hidden>→</span>
           </a>
           <a
             className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] bg-transparent text-[color:var(--text)]"
@@ -299,12 +293,10 @@ export default function Homepage() {
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {[
-            "Plumbers",
-            "HVAC",
-            "Electricians",
-            "Med spas",
+            "Local service businesses",
             "Clinics & practices",
-            "Contractors",
+            "Retail & restaurants",
+            "Trades & contractors",
           ].map((t) => (
             <span
               key={t}
@@ -506,19 +498,19 @@ export default function Homepage() {
                     id="book"
                   >
                     <h2 className="text-[clamp(20px,3vw,26px)] font-extrabold">
-                      Book a free lead audit
+                      Let’s scope your first win
                     </h2>
-                    <p className="mt-2 text-[color:var(--muted)] max-w-[80ch]">
-                      I’ll review how leads come in from your website and
-                      Instagram (and how fast they’re handled). You’ll get a
-                      short action plan you can implement immediately—whether
-                      you work with ORBISY or not.
+                    <p className="mt-2 text-[color:var(--muted)] max-w-[70ch]">
+                      Tell me what tools you use and where work gets stuck. I’ll
+                      propose one high-impact build (and a clear fixed price)
+                      within 48 hours.
                     </p>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
-                        <h3 className="text-lg font-bold">Request the audit</h3>
+                        <h3 className="text-lg font-bold">Quick intake</h3>
                         <form className="mt-3 grid gap-3" onSubmit={onSubmit}>
+                          {/* honeypot */}
                           <input
                             name="website"
                             tabIndex={-1}
@@ -534,7 +526,7 @@ export default function Homepage() {
                             <input
                               name="businessName"
                               className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] px-3 py-2 outline-none focus:ring-2 focus:ring-white/20"
-                              placeholder="Acme Electric"
+                              placeholder="Acme Plumbing"
                             />
                           </label>
 
@@ -553,13 +545,13 @@ export default function Homepage() {
 
                           <label className="grid gap-1">
                             <span className="text-sm text-[color:var(--muted)]">
-                              What happens when a lead comes in?
+                              What are you trying to fix?
                             </span>
                             <textarea
                               name="message"
                               required
                               className="min-h-[96px] rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] px-3 py-2 outline-none focus:ring-2 focus:ring-white/20"
-                              placeholder="Leads come from our website + IG DMs. Response time varies…"
+                              placeholder="We manually copy leads into our CRM, then send texts one-by-one…"
                             />
                           </label>
 
@@ -568,13 +560,13 @@ export default function Homepage() {
                             type="submit"
                             disabled={sending}
                           >
-                            {sending ? "Sending..." : "Request audit"}{" "}
+                            {sending ? "Sending..." : "Request proposal"}{" "}
                             <span aria-hidden>→</span>
                           </button>
 
                           {status === "ok" && (
                             <p className="text-sm text-[color:var(--accent-2)]">
-                              Sent! I’ll reply soon with next steps.
+                              Sent! I’ll reply soon.
                             </p>
                           )}
                           {status === "error" && (
@@ -586,17 +578,19 @@ export default function Homepage() {
                       </div>
 
                       <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
-                        <h3 className="text-lg font-bold">What you’ll get</h3>
+                        <h3 className="text-lg font-bold">What to expect</h3>
                         <ul className="mt-2 list-disc pl-5 text-[color:var(--muted)]">
-                          <li>15–20 minute call</li>
-                          <li>Where leads are being missed (if anywhere)</li>
-                          <li>Recommended “72-hour fix” plan</li>
-                          <li>Clear next steps (with or without us)</li>
+                          <li>
+                            Short call (15–20 min) to understand your workflow
+                          </li>
+                          <li>Written scope + fixed price</li>
+                          <li>Build + handoff docs + training</li>
                         </ul>
 
                         <div className="mt-4 rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
-                          <h4 className="font-bold">Prefer email?</h4>
+                          <h4 className="font-bold">Need help right now?</h4>
                           <p className="mt-1 text-[color:var(--muted)]">
+                            Email:{" "}
                             <a
                               className="text-[color:var(--accent)]"
                               href="mailto:info@orbisy.com"
@@ -604,6 +598,7 @@ export default function Homepage() {
                               info@orbisy.com
                             </a>
                             <br />
+                            Phone:{" "}
                             <span className="text-[color:var(--muted)]">
                               (331) 703-4585
                             </span>
@@ -620,28 +615,27 @@ export default function Homepage() {
           <div id="work" className="p-6">
             <div className="rounded-[var(--radius)] border border-[color:var(--border)] bg-[color:var(--panel)] p-6">
               <h2 className="text-[clamp(20px,3vw,26px)] font-extrabold">
-                How it works
+                How it works (shared)
               </h2>
               <div className="mt-3 grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="text-[color:var(--muted)]">
-                    Most local businesses don’t need “more leads”—they need to
-                    stop losing the ones they already get. We start by fixing
-                    speed-to-lead and follow-up, then expand only if it’s paying
-                    for itself.
+                    You don’t need a 6-month project plan. We start with a
+                    single outcome that saves time or increases revenue, ship
+                    quickly, then decide what’s next.
                   </p>
-                  <ol className="mt-3 list-decimal pl-5 text-[color:var(--muted)]">
-                    <li>Audit your lead sources (website + Instagram)</li>
-                    <li>Set up instant replies + owner alerts</li>
-                    <li>Track follow-up so nothing slips</li>
-                  </ol>
+                  <ul className="mt-3 list-disc pl-5 text-[color:var(--muted)]">
+                    <li>Clear scope & deliverables</li>
+                    <li>Fast builds, frequent demos</li>
+                    <li>Documentation + ownership</li>
+                  </ul>
                 </div>
                 <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
                   <h3 className="text-lg font-bold">Good fit if you…</h3>
                   <ul className="mt-2 list-disc pl-5 text-[color:var(--muted)]">
-                    <li>Get leads but response time varies</li>
-                    <li>Have website forms + IG DMs in different places</li>
-                    <li>Lose jobs because follow-up isn’t consistent</li>
+                    <li>Do the same admin tasks every day</li>
+                    <li>Lose leads because responses are slow</li>
+                    <li>Run ops from spreadsheets/text threads</li>
                   </ul>
                 </div>
               </div>
