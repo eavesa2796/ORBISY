@@ -260,7 +260,7 @@ export default function Homepage() {
             >
               Services
             </a>
-            <CalendlyButton className="cursor-pointerrounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
+            <CalendlyButton className="cursor-pointer rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
               Book Audit
             </CalendlyButton>
           </div>
