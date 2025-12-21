@@ -298,25 +298,29 @@ export default function Homepage() {
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          {[
-            "Plumbers",
-            "HVAC",
-            "Electricians",
-            "Med spas",
-            "Clinics & practices",
-            "Contractors",
-          ].map((t) => (
-            <span
-              key={t}
-              className="rounded-full border border-[color:var(--border)] bg-white/5 px-3 py-1 text-[13px] text-[color:var(--muted)]"
-            >
-              {t}
-            </span>
-          ))}
-          <p className="mt-3 text-sm text-[color:var(--muted)]">
-            Most Lead Follow-Up Fix setups start at{" "}
-            <strong>$750 one-time</strong>.
-          </p>
+          <div>
+            {[
+              "Plumbers",
+              "HVAC",
+              "Electricians",
+              "Med spas",
+              "Clinics & practices",
+              "Contractors",
+            ].map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-[color:var(--border)] bg-white/5 px-3 py-1 text-[13px] text-[color:var(--muted)]"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+          <div>
+            <p className="mt-3 text-sm text-[color:var(--muted)]">
+              Most Lead Follow-Up Fix setups start at{" "}
+              <strong>$750 one-time</strong>.
+            </p>
+          </div>
         </div>
       </header>
 
