@@ -315,7 +315,7 @@ export default function Homepage() {
               </span>
             ))}
           </div>
-          <div>
+          <div className="w-full">
             <p className="mt-3 text-sm text-[color:var(--muted)]">
               Most Lead Follow-Up Fix setups start at{" "}
               <strong>$750 one-time</strong>.
