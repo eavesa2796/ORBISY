@@ -314,6 +314,19 @@ export default function Homepage() {
             </span>
           ))}
         </div>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <a
+            className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
+            href="#book"
+          >
+            Book a Free Lead Audit <span aria-hidden>→</span>
+          </a>
+        </div>
+
+        <p className="mt-3 text-sm text-[color:var(--muted)]">
+          Most Lead Follow-Up Fix setups start at <strong>$750 one-time</strong>
+          .
+        </p>
       </header>
 
       <main className="mx-auto max-w-[1100px] px-5 pb-16" id="services">
