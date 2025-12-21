@@ -260,7 +260,7 @@ export default function Homepage() {
             >
               Services
             </a>
-            <CalendlyButton className="rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
+            <CalendlyButton className="cursor-pointerrounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
               Book Audit
             </CalendlyButton>
           </div>
@@ -281,7 +281,7 @@ export default function Homepage() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <CalendlyButton className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]">
+          <CalendlyButton className="cursor-pointer inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]">
             Book a Free Lead Audit →
           </CalendlyButton>
           <a
