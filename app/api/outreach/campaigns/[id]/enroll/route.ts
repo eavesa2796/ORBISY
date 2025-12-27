@@ -11,10 +11,10 @@ export const runtime = "nodejs";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: campaignId } = params;
+    const { id: campaignId } = await params;
     const body = await request.json();
     const { leadIds } = body;
 
@@ -157,7 +157,9 @@ export async function POST(
         results.enrolled++;
       } catch (err) {
         results.errors.push(
-          `Failed to enroll ${lead.company}: ${err instanceof Error ? err.message : String(err)}`
+          `Failed to enroll ${lead.company}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
         );
       }
     }
