@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/outreach/Toast";
 
 export default function ConsoleLayout({
@@ -6,16 +9,26 @@ export default function ConsoleLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       <ToastContainer />
-      
+
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
         <div className="flex items-center justify-center h-16 border-b border-gray-800">
           <h1 className="text-xl font-bold">ORBISY Console</h1>
         </div>
-        
+
         <nav className="mt-8 px-4 space-y-2">
           <NavLink href="/console" icon="📊">
             Dashboard
@@ -33,6 +46,17 @@ export default function ConsoleLayout({
             Settings
           </NavLink>
         </nav>
+
+        {/* Logout button */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors text-white font-medium"
+          >
+            <span className="mr-2">🚪</span>
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Main content */}
