@@ -20,5 +20,5 @@ export function middleware(request: NextRequest) {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: "/console/:path*",
+  matcher: ["/console/:path*", "/console"],
 };
