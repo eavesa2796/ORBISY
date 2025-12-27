@@ -3,6 +3,9 @@
 import { useState, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// Force dynamic rendering to prevent prerendering issues
+export const dynamic = "force-dynamic";
+
 function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
