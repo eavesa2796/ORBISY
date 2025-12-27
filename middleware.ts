@@ -6,9 +6,10 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/console")) {
     // Check for authentication cookie
     const authToken = request.cookies.get("auth-token")?.value;
+    const expectedToken = process.env.AUTH_TOKEN;
 
-    // If no auth token, redirect to login
-    if (!authToken || authToken !== process.env.AUTH_TOKEN) {
+    // If no auth token or token doesn't match, redirect to login
+    if (!authToken || !expectedToken || authToken !== expectedToken) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);

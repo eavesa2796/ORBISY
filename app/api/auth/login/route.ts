@@ -18,10 +18,13 @@ export async function POST(request: NextRequest) {
       // Create response with auth cookie
       const response = NextResponse.json({ success: true });
 
+      const isProduction = process.env.NODE_ENV === "production";
+      const authToken = process.env.AUTH_TOKEN || "authenticated";
+
       // Set secure HTTP-only cookie
-      response.cookies.set("auth-token", process.env.AUTH_TOKEN || "authenticated", {
+      response.cookies.set("auth-token", authToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 60 * 60 * 24 * 7, // 7 days
         path: "/",
@@ -30,14 +33,8 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    return NextResponse.json(
-      { error: "Invalid password" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Invalid password" }, { status: 401 });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }
