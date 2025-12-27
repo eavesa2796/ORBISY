@@ -13,3 +13,192 @@ model Lead {
   message      String
   createdAt    DateTime @default(now())
 }
+
+// ==================== OUTREACH MODULE ====================
+
+enum OutreachLeadStage {
+  NEW
+  CONTACTED
+  REPLIED
+  BOOKED
+  WON
+  LOST
+}
+
+model OutreachLead {
+  id               String            @id @default(cuid())
+  company          String
+  contactName      String
+  role             String?
+  email            String?           @unique
+  phone            String?
+  website          String?
+  city             String?
+  industry         String?
+  stage            OutreachLeadStage @default(NEW)
+  score            Int               @default(50)
+  tags             String[]          @default([])
+  notes            String?
+  ownerUserId      String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  lastTouchAt      DateTime?
+  lastActivity     String?
+  nextStep         String?
+  doNotContact     Boolean           @default(false)
+  unsubscribedAt   DateTime?
+  
+  enrollments      OutreachEnrollment[]
+  messages         OutreachMessage[]
+  replies          OutreachReply[]
+
+  @@index([email])
+  @@index([stage])
+  @@index([doNotContact])
+}
+
+enum CampaignChannel {
+  EMAIL
+  LINKEDIN
+  SMS
+}
+
+enum CampaignStatus {
+  RUNNING
+  PAUSED
+}
+
+model OutreachCampaign {
+  id                    String          @id @default(cuid())
+  name                  String
+  channel               CampaignChannel @default(EMAIL)
+  status                CampaignStatus  @default(PAUSED)
+  dailyLimit            Int             @default(30)
+  fromMailbox           String
+  audienceIndustry      String?
+  audienceGeoContains   String?
+  audienceMinScore      Int?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  
+  steps                 OutreachCampaignStep[]
+  enrollments           OutreachEnrollment[]
+  messages              OutreachMessage[]
+  replies               OutreachReply[]
+
+  @@index([status])
+}
+
+model OutreachCampaignStep {
+  id              String   @id @default(cuid())
+  campaignId      String
+  stepIndex       Int
+  dayOffset       Int
+  subjectTemplate String
+  bodyTemplate    String   @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  campaign        OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  messages        OutreachMessage[]
+
+  @@unique([campaignId, stepIndex])
+  @@index([campaignId])
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  STOPPED
+}
+
+model OutreachEnrollment {
+  id             String           @id @default(cuid())
+  leadId         String
+  campaignId     String
+  status         EnrollmentStatus @default(ACTIVE)
+  enrolledAt     DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  stoppedReason  String?
+  
+  lead           OutreachLead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  campaign       OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([leadId, campaignId])
+  @@index([status])
+  @@index([leadId])
+  @@index([campaignId])
+}
+
+enum MessageStatus {
+  SCHEDULED
+  SENT
+  DELIVERED
+  FAILED
+  REPLIED
+  CANCELED
+}
+
+model OutreachMessage {
+  id                  String        @id @default(cuid())
+  leadId              String
+  campaignId          String
+  stepId              String
+  scheduledFor        DateTime
+  sentAt              DateTime?
+  providerMessageId   String?
+  status              MessageStatus @default(SCHEDULED)
+  subjectRendered     String
+  bodyRendered        String        @db.Text
+  deliveredAt         DateTime?
+  error               String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  
+  lead                OutreachLead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  campaign            OutreachCampaign     @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  step                OutreachCampaignStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  replies             OutreachReply[]
+
+  @@index([scheduledFor, status])
+  @@index([leadId])
+  @@index([campaignId])
+  @@index([status])
+}
+
+enum ReplySentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+model OutreachReply {
+  id          String         @id @default(cuid())
+  leadId      String
+  campaignId  String
+  messageId   String?
+  receivedAt  DateTime
+  fromEmail   String
+  subject     String
+  body        String         @db.Text
+  sentiment   ReplySentiment @default(NEUTRAL)
+  raw         Json?
+  createdAt   DateTime       @default(now())
+  
+  lead        OutreachLead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  campaign    OutreachCampaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  message     OutreachMessage?  @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  @@index([leadId])
+  @@index([campaignId])
+  @@index([receivedAt])
+}
+
+model OutreachUnsubscribe {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
