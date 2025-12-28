@@ -301,12 +301,14 @@ export default function UsersPage() {
                 role: e.target.value as "ADMIN" | "USER",
               })
             }
-          >
-            <option value="USER">User</option>
-            <option value="ADMIN">Admin</option>
-          </Select>
+            options={[
+              { value: "USER", label: "User" },
+              { value: "ADMIN", label: "Admin" },
+            ]}
+          />
 
           <div className="flex justify-end gap-2 pt-4">
+            \n{" "}
             <Button
               type="button"
               variant="secondary"
