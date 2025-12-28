@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Check if user is trying to access /console routes
   if (request.nextUrl.pathname.startsWith("/console")) {
     // Check for session cookie
@@ -21,7 +21,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configure which routes to run middleware on
+// Configure which routes to run proxy on
 export const config = {
   matcher: ["/console/:path*", "/console"],
 };
