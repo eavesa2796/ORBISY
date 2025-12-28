@@ -21,13 +21,15 @@ export default function ConsoleClientLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[linear-gradient(180deg,var(--bg),#0a0f1b_40%,#090d17)] text-[color:var(--text)]">
       <ToastContainer />
 
       {/* Sidebar */}
-      <div className="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
-        <div className="flex items-center justify-center h-16 border-b border-gray-800">
-          <h1 className="text-xl font-bold">ORBISY Console</h1>
+      <div className="fixed inset-y-0 left-0 w-64 bg-[color:var(--panel)] border-r border-[color:var(--border)]">
+        <div className="flex items-center justify-center h-16 border-b border-[color:var(--border)]">
+          <h1 className="text-xl font-bold text-[color:var(--text)]">
+            ORBISY Console
+          </h1>
         </div>
 
         <nav className="mt-8 px-4 space-y-2">
@@ -52,10 +54,10 @@ export default function ConsoleClientLayout({
         </nav>
 
         {/* Logout button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[color:var(--border)]">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors text-white font-medium"
+            className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-colors text-red-400 font-medium"
           >
             <span className="mr-2">🚪</span>
             Logout
@@ -83,7 +85,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="flex items-center px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+      className="flex items-center px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-[color:var(--text)] hover:text-[color:var(--accent)]"
     >
       <span className="mr-3">{icon}</span>
       <span>{children}</span>

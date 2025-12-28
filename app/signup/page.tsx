@@ -73,21 +73,21 @@ function SignupForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[linear-gradient(180deg,var(--bg),#0a0f1b_40%,#090d17)] text-[color:var(--text)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-[color:var(--text)] mb-2">
               Create Account
             </h1>
-            <p className="text-gray-600">Join ORBISY Console</p>
+            <p className="text-[color:var(--muted)]">Join ORBISY Console</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[color:var(--text)] mb-2"
               >
                 Full Name
               </label>
@@ -97,7 +97,7 @@ function SignupForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 bg-white/5 border border-[color:var(--border)] rounded-xl text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent outline-none transition"
                 placeholder="Enter your full name"
                 disabled={loading}
               />
@@ -106,7 +106,7 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[color:var(--text)] mb-2"
               >
                 Email
               </label>
@@ -116,7 +116,7 @@ function SignupForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 bg-white/5 border border-[color:var(--border)] rounded-xl text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent outline-none transition"
                 placeholder="Enter your email"
                 disabled={loading}
               />
@@ -125,7 +125,7 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[color:var(--text)] mb-2"
               >
                 Password
               </label>
@@ -136,7 +136,7 @@ function SignupForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 bg-white/5 border border-[color:var(--border)] rounded-xl text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent outline-none transition"
                 placeholder="At least 8 characters"
                 disabled={loading}
               />
@@ -145,7 +145,7 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-[color:var(--text)] mb-2"
               >
                 Confirm Password
               </label>
@@ -156,14 +156,14 @@ function SignupForm() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                className="w-full px-4 py-3 bg-white/5 border border-[color:var(--border)] rounded-xl text-[color:var(--text)] placeholder:text-[color:var(--muted)] focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent outline-none transition"
                 placeholder="Confirm your password"
                 disabled={loading}
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -171,25 +171,25 @@ function SignupForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg hover:shadow-xl"
+              className="w-full bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] hover:opacity-90 disabled:opacity-50 text-[#001] font-bold py-3 rounded-xl transition duration-200 shadow-[var(--shadow)]"
             >
               {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
           <div className="mt-6 text-center space-y-3">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-[color:var(--muted)]">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-blue-600 hover:text-blue-700 font-semibold"
+                className="text-[color:var(--accent)] hover:text-[color:var(--accent-2)] font-semibold transition"
               >
                 Sign in
               </Link>
             </p>
             <a
               href="/"
-              className="block text-sm text-gray-600 hover:text-gray-900 transition"
+              className="block text-sm text-[color:var(--muted)] hover:text-[color:var(--text)] transition"
             >
               ← Back to homepage
             </a>
