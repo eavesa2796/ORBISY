@@ -56,8 +56,10 @@ export default function InboxPage() {
       label: "From",
       render: (reply: Reply) => (
         <div>
-          <p className="font-medium">{reply.lead.company}</p>
-          <p className="text-sm text-gray-500">{reply.fromEmail}</p>
+          <p className="font-medium text-[color:var(--text)]">
+            {reply.lead.company}
+          </p>
+          <p className="text-sm text-[color:var(--muted)]">{reply.fromEmail}</p>
         </div>
       ),
     },
@@ -86,19 +88,22 @@ export default function InboxPage() {
     {
       key: "receivedAt",
       label: "Received",
-      render: (reply: Reply) =>
-        new Date(reply.receivedAt).toLocaleDateString(),
+      render: (reply: Reply) => new Date(reply.receivedAt).toLocaleDateString(),
     },
   ];
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return (
+      <div className="text-center py-12 text-[color:var(--muted)]">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Inbox</h1>
+        <h1 className="text-3xl font-bold text-[color:var(--text)]">Inbox</h1>
         <div className="flex space-x-2">
           <FilterButton
             active={filter === "all"}
@@ -197,8 +202,8 @@ function ReplyDetailModal({
               reply.sentiment === "POSITIVE"
                 ? "success"
                 : reply.sentiment === "NEGATIVE"
-                  ? "danger"
-                  : "info"
+                ? "danger"
+                : "info"
             }
           >
             {reply.sentiment}

@@ -12,8 +12,9 @@ export default function SettingsPage() {
   const { showToast } = useToast();
 
   function generateSecret() {
-    const secret = Array.from({ length: 32 }, () =>
-      Math.random().toString(36)[2]
+    const secret = Array.from(
+      { length: 32 },
+      () => Math.random().toString(36)[2]
     ).join("");
     setCronSecret(secret);
     showToast({ message: "Secret generated", type: "success" });
@@ -26,13 +27,17 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
+      <h1 className="text-3xl font-bold text-[color:var(--text)] mb-8">
+        Settings
+      </h1>
 
       <div className="space-y-8">
         {/* Environment Variables */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Environment Variables</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
+          <h2 className="text-xl font-semibold text-[color:var(--text)] mb-4">
+            Environment Variables
+          </h2>
+          <p className="text-sm text-[color:var(--muted)] mb-4">
             Add these to your .env.local file:
           </p>
 
@@ -73,14 +78,16 @@ export default function SettingsPage() {
         </div>
 
         {/* Cron Setup */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Cron Job Setup</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
+          <h2 className="text-xl font-semibold text-[color:var(--text)] mb-4">
+            Cron Job Setup
+          </h2>
+          <p className="text-sm text-[color:var(--muted)] mb-4">
             Configure Vercel Cron to run the worker every 10 minutes:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm overflow-x-auto">
-            <pre>{`{
+          <div className="bg-white/5 rounded p-4 font-mono text-sm overflow-x-auto border border-[color:var(--border)]">
+            <pre className="text-[color:var(--text)]">{`{
   "crons": [{
     "path": "/api/outreach/worker/send-due",
     "schedule": "*/10 * * * *"
@@ -88,53 +95,57 @@ export default function SettingsPage() {
 }`}</pre>
           </div>
 
-          <p className="text-sm text-gray-600 mt-4">
+          <p className="text-sm text-[color:var(--muted)] mt-4">
             Or test locally by calling the endpoint with:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm mt-2">
-            <pre>{`curl -X POST http://localhost:3000/api/outreach/worker/send-due \\
+          <div className="bg-white/5 rounded p-4 font-mono text-sm mt-2 border border-[color:var(--border)]">
+            <pre className="text-[color:var(--text)]">{`curl -X POST http://localhost:3000/api/outreach/worker/send-due \\
   -H "x-orbisy-cron-secret: ${cronSecret || "YOUR_SECRET"}"`}</pre>
           </div>
         </div>
 
         {/* Webhook Setup */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Inbound Email Webhook</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
+          <h2 className="text-xl font-semibold text-[color:var(--text)] mb-4">
+            Inbound Email Webhook
+          </h2>
+          <p className="text-sm text-[color:var(--muted)] mb-4">
             Configure your email provider to send inbound emails to:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm">
+          <div className="bg-white/5 rounded p-4 font-mono text-sm border border-[color:var(--border)] text-[color:var(--text)]">
             {process.env.NEXT_PUBLIC_URL || "https://yourdomain.com"}
             /api/outreach/webhooks/inbound-email
           </div>
 
-          <p className="text-sm text-gray-600 mt-4">
+          <p className="text-sm text-[color:var(--muted)] mt-4">
             Include the webhook secret in the header:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm mt-2">
+          <div className="bg-white/5 rounded p-4 font-mono text-sm mt-2 border border-[color:var(--border)] text-[color:var(--text)]">
             x-webhook-secret: YOUR_INBOUND_WEBHOOK_SECRET
           </div>
         </div>
 
         {/* Database Migration */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Database Migration</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
+          <h2 className="text-xl font-semibold text-[color:var(--text)] mb-4">
+            Database Migration
+          </h2>
+          <p className="text-sm text-[color:var(--muted)] mb-4">
             Run the migration to create outreach tables:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm">
+          <div className="bg-white/5 rounded p-4 font-mono text-sm border border-[color:var(--border)] text-[color:var(--text)]">
             npx prisma migrate dev --name add_outreach_module
           </div>
 
-          <p className="text-sm text-gray-600 mt-4">
+          <p className="text-sm text-[color:var(--muted)] mt-4">
             Then generate the Prisma client:
           </p>
 
-          <div className="bg-gray-50 rounded p-4 font-mono text-sm mt-2">
+          <div className="bg-white/5 rounded p-4 font-mono text-sm mt-2 border border-[color:var(--border)] text-[color:var(--text)]">
             npx prisma generate
           </div>
         </div>
@@ -161,7 +172,9 @@ function EnvVar({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="text-sm font-medium text-gray-700">{name}</label>
+        <label className="text-sm font-medium text-[color:var(--text)]">
+          {name}
+        </label>
         <div className="space-x-2">
           {onGenerate && (
             <Button size="sm" variant="secondary" onClick={onGenerate}>
@@ -175,7 +188,7 @@ function EnvVar({
           )}
         </div>
       </div>
-      <p className="text-xs text-gray-500 mb-2">{description}</p>
+      <p className="text-xs text-[color:var(--muted)] mb-2">{description}</p>
       <Input
         value={value}
         placeholder={placeholder}

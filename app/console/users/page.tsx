@@ -148,7 +148,7 @@ export default function UsersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading users...</div>
+        <div className="text-[color:var(--muted)]">Loading users...</div>
       </div>
     );
   }
@@ -156,51 +156,55 @@ export default function UsersPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
+        <h1 className="text-3xl font-bold text-[color:var(--text)]">
+          User Management
+        </h1>
         <Button onClick={() => handleOpenModal()}>+ Add User</Button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] overflow-hidden">
+        <table className="min-w-full divide-y divide-[color:var(--border)]">
+          <thead className="bg-white/5">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase">
                 Role
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase">
                 Last Login
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+              <th className="px-6 py-3 text-right text-xs font-medium text-[color:var(--muted)] uppercase">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-transparent divide-y divide-[color:var(--border)]">
             {users.map((user) => (
               <tr key={user.id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className="text-sm font-medium text-[color:var(--text)]">
                     {user.name}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{user.email}</div>
+                  <div className="text-sm text-[color:var(--muted)]">
+                    {user.email}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       user.role === "ADMIN"
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-gray-100 text-gray-800"
+                        ? "bg-purple-500/20 text-purple-300"
+                        : "bg-white/10 text-[color:var(--muted)]"
                     }`}
                   >
                     {user.role}
@@ -210,14 +214,14 @@ export default function UsersPage() {
                   <span
                     className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       user.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-green-500/20 text-green-300"
+                        : "bg-red-500/20 text-red-300"
                     }`}
                   >
                     {user.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--muted)]">
                   {user.lastLoginAt
                     ? new Date(user.lastLoginAt).toLocaleDateString()
                     : "Never"}
@@ -225,19 +229,19 @@ export default function UsersPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                   <button
                     onClick={() => handleOpenModal(user)}
-                    className="text-blue-600 hover:text-blue-900"
+                    className="text-[color:var(--accent)] hover:text-[color:var(--accent-2)]"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleToggleActive(user)}
-                    className="text-yellow-600 hover:text-yellow-900"
+                    className="text-yellow-400 hover:text-yellow-300"
                   >
                     {user.isActive ? "Deactivate" : "Activate"}
                   </button>
                   <button
                     onClick={() => handleDelete(user.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-400 hover:text-red-300"
                   >
                     Delete
                   </button>
@@ -248,7 +252,7 @@ export default function UsersPage() {
         </table>
 
         {users.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-[color:var(--muted)]">
             No users found. Click "Add User" to create one.
           </div>
         )}

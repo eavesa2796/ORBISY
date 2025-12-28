@@ -23,42 +23,42 @@ export function DataTable<T extends Record<string, any>>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-[color:var(--muted)]">
         <p>{emptyMessage}</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className="overflow-x-auto bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)]">
+      <table className="min-w-full divide-y divide-[color:var(--border)]">
+        <thead className="bg-white/5">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-[color:var(--muted)] uppercase tracking-wider"
               >
                 {column.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-transparent divide-y divide-[color:var(--border)]">
           {data.map((item, index) => (
             <tr
               key={index}
               onClick={() => onRowClick?.(item)}
               className={
                 onRowClick
-                  ? "hover:bg-gray-50 cursor-pointer transition-colors"
+                  ? "hover:bg-white/5 cursor-pointer transition-colors"
                   : ""
               }
             >
               {columns.map((column) => (
                 <td
                   key={column.key}
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                  className="px-6 py-4 whitespace-nowrap text-sm text-[color:var(--text)]"
                 >
                   {column.render
                     ? column.render(item)

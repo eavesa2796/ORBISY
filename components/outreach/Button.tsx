@@ -20,13 +20,12 @@ export function Button({
 
   const variantClasses = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
+      "bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001] hover:opacity-90 focus:ring-[color:var(--accent)]",
     secondary:
-      "bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500",
-    danger:
-      "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+      "bg-white/10 text-[color:var(--text)] hover:bg-white/20 focus:ring-[color:var(--accent)] border border-[color:var(--border)]",
+    danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     ghost:
-      "text-gray-700 hover:bg-gray-100 focus:ring-gray-500",
+      "text-[color:var(--text)] hover:bg-white/10 focus:ring-[color:var(--accent)]",
   };
 
   const sizeClasses = {

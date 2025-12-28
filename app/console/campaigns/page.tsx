@@ -35,7 +35,9 @@ export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(
+    null
+  );
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -127,13 +129,19 @@ export default function CampaignsPage() {
   ];
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return (
+      <div className="text-center py-12 text-[color:var(--muted)]">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Campaigns</h1>
+        <h1 className="text-3xl font-bold text-[color:var(--text)]">
+          Campaigns
+        </h1>
         <Button onClick={() => setShowAddModal(true)}>Create Campaign</Button>
       </div>
 
@@ -272,7 +280,12 @@ function CreateCampaignModal({
         <div>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Email Sequence</h3>
-            <Button type="button" variant="secondary" size="sm" onClick={addStep}>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={addStep}
+            >
               + Add Step
             </Button>
           </div>
@@ -359,14 +372,11 @@ function CampaignDetailModal({
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `/api/outreach/campaigns/${campaign.id}/enroll`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        }
-      );
+      const res = await fetch(`/api/outreach/campaigns/${campaign.id}/enroll`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
 
       const data = await res.json();
 
@@ -392,7 +402,12 @@ function CampaignDetailModal({
         <div>
           <h3 className="font-semibold text-lg">{campaign.name}</h3>
           <p className="text-sm text-gray-600">
-            Status: <Badge variant={campaign.status === "RUNNING" ? "success" : "default"}>{campaign.status}</Badge>
+            Status:{" "}
+            <Badge
+              variant={campaign.status === "RUNNING" ? "success" : "default"}
+            >
+              {campaign.status}
+            </Badge>
           </p>
           <p className="text-sm text-gray-600 mt-1">
             From: {campaign.fromMailbox}
@@ -415,7 +430,9 @@ function CampaignDetailModal({
         </div>
 
         <div>
-          <h4 className="font-medium mb-2">Sequence Steps ({campaign.steps.length})</h4>
+          <h4 className="font-medium mb-2">
+            Sequence Steps ({campaign.steps.length})
+          </h4>
           <div className="space-y-2">
             {campaign.steps.map((step, index) => (
               <div key={index} className="border rounded p-3 text-sm">

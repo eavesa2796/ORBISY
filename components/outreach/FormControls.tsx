@@ -11,12 +11,12 @@ export function Input({ label, error, className = "", ...props }: InputProps) {
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--text)] mb-1">
           {label}
         </label>
       )}
       <input
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+        className={`w-full px-3 py-2 border border-[color:var(--border)] bg-white/5 text-[color:var(--text)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent placeholder:text-[color:var(--muted)] ${
           error ? "border-red-500" : ""
         } ${className}`}
         {...props}
@@ -41,12 +41,12 @@ export function Textarea({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--text)] mb-1">
           {label}
         </label>
       )}
       <textarea
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+        className={`w-full px-3 py-2 border border-[color:var(--border)] bg-white/5 text-[color:var(--text)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent placeholder:text-[color:var(--muted)] ${
           error ? "border-red-500" : ""
         } ${className}`}
         {...props}
@@ -72,12 +72,12 @@ export function Select({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-[color:var(--text)] mb-1">
           {label}
         </label>
       )}
       <select
-        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+        className={`w-full px-3 py-2 border border-[color:var(--border)] bg-white/5 text-[color:var(--text)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--accent)] focus:border-transparent ${
           error ? "border-red-500" : ""
         } ${className}`}
         {...props}

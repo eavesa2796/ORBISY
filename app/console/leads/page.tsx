@@ -104,13 +104,17 @@ export default function LeadsPage() {
   ];
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return (
+      <div className="text-center py-12 text-[color:var(--muted)]">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Leads</h1>
+        <h1 className="text-3xl font-bold text-[color:var(--text)]">Leads</h1>
         <div className="space-x-3">
           <Button variant="secondary" onClick={() => setShowImportModal(true)}>
             Import CSV
