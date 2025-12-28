@@ -5,6 +5,8 @@ import { DataTable } from "@/components/outreach/DataTable";
 import { Badge } from "@/components/outreach/Badge";
 import { Modal } from "@/components/outreach/Modal";
 import { Button } from "@/components/outreach/Button";
+import { Input, Textarea } from "@/components/outreach/FormControls";
+import { useToast } from "@/components/outreach/Toast";
 
 interface Reply {
   id: string;
@@ -27,6 +29,13 @@ export default function InboxPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReply, setSelectedReply] = useState<Reply | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [showTestModal, setShowTestModal] = useState(false);
+  const [testData, setTestData] = useState({
+    email: "",
+    subject: "",
+    body: "",
+  });
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchReplies();
@@ -47,6 +56,35 @@ export default function InboxPage() {
       console.error("Failed to fetch inbox:", error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleTestReply() {
+    try {
+      const res = await fetch("/api/outreach/webhooks/test-inbound", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(testData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast({
+          message: `Test reply created! Sentiment: ${data.sentiment}`,
+          type: "success",
+        });
+        setShowTestModal(false);
+        setTestData({ email: "", subject: "", body: "" });
+        fetchReplies();
+      } else {
+        showToast({
+          message: data.error || "Failed to create test reply",
+          type: "error",
+        });
+      }
+    } catch (error) {
+      showToast({ message: "Error creating test reply", type: "error" });
     }
   }
 
@@ -104,31 +142,36 @@ export default function InboxPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-[color:var(--text)]">Inbox</h1>
-        <div className="flex space-x-2">
-          <FilterButton
-            active={filter === "all"}
-            onClick={() => setFilter("all")}
-          >
-            All
-          </FilterButton>
-          <FilterButton
-            active={filter === "POSITIVE"}
-            onClick={() => setFilter("POSITIVE")}
-          >
-            Positive
-          </FilterButton>
-          <FilterButton
-            active={filter === "NEUTRAL"}
-            onClick={() => setFilter("NEUTRAL")}
-          >
-            Neutral
-          </FilterButton>
-          <FilterButton
-            active={filter === "NEGATIVE"}
-            onClick={() => setFilter("NEGATIVE")}
-          >
-            Negative
-          </FilterButton>
+        <div className="flex gap-4">
+          <Button variant="secondary" onClick={() => setShowTestModal(true)}>
+            🧪 Test Reply
+          </Button>
+          <div className="flex space-x-2">
+            <FilterButton
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+            >
+              All
+            </FilterButton>
+            <FilterButton
+              active={filter === "POSITIVE"}
+              onClick={() => setFilter("POSITIVE")}
+            >
+              Positive
+            </FilterButton>
+            <FilterButton
+              active={filter === "NEUTRAL"}
+              onClick={() => setFilter("NEUTRAL")}
+            >
+              Neutral
+            </FilterButton>
+            <FilterButton
+              active={filter === "NEGATIVE"}
+              onClick={() => setFilter("NEGATIVE")}
+            >
+              Negative
+            </FilterButton>
+          </div>
         </div>
       </div>
 
@@ -146,6 +189,80 @@ export default function InboxPage() {
           reply={selectedReply}
           onClose={() => setSelectedReply(null)}
         />
+      )}
+
+      {/* Test Reply Modal */}
+      {showTestModal && (
+        <Modal
+          isOpen={showTestModal}
+          onClose={() => setShowTestModal(false)}
+          title="Create Test Reply"
+          size="md"
+        >
+          <div className="space-y-4">
+            <p className="text-sm text-[color:var(--muted)]">
+              This creates a simulated inbound reply for testing. Enter the
+              email of an existing lead who has been sent a message.
+            </p>
+
+            <Input
+              label="Lead Email"
+              type="email"
+              placeholder="lead@company.com"
+              value={testData.email}
+              onChange={(e) =>
+                setTestData({ ...testData, email: e.target.value })
+              }
+              required
+            />
+
+            <Input
+              label="Subject"
+              placeholder="Re: Your email subject"
+              value={testData.subject}
+              onChange={(e) =>
+                setTestData({ ...testData, subject: e.target.value })
+              }
+              required
+            />
+
+            <Textarea
+              label="Message Body"
+              placeholder="Yes, I'm interested! Let's schedule a call."
+              rows={6}
+              value={testData.body}
+              onChange={(e) =>
+                setTestData({ ...testData, body: e.target.value })
+              }
+              required
+            />
+
+            <div className="bg-white/5 border border-[color:var(--border)] rounded-lg p-3">
+              <p className="text-xs text-[color:var(--muted)]">
+                <strong>Tip:</strong> Include keywords like "interested",
+                "schedule", "call me" for POSITIVE sentiment, or "not
+                interested", "unsubscribe" for NEGATIVE sentiment.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="secondary"
+                onClick={() => setShowTestModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleTestReply}
+                disabled={
+                  !testData.email || !testData.subject || !testData.body
+                }
+              >
+                Create Test Reply
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );
@@ -165,8 +282,8 @@ function FilterButton({
       onClick={onClick}
       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
         active
-          ? "bg-blue-600 text-white"
-          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          ? "bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]"
+          : "bg-white/10 text-[color:var(--text)] hover:bg-white/20 border border-[color:var(--border)]"
       }`}
     >
       {children}
@@ -190,13 +307,15 @@ function ReplyDetailModal({
     <Modal isOpen={true} onClose={onClose} title="Reply Details" size="lg">
       <div className="space-y-4">
         <div>
-          <p className="text-sm text-gray-600">From</p>
-          <p className="font-medium">{reply.lead.company}</p>
-          <p className="text-sm text-gray-500">{reply.fromEmail}</p>
+          <p className="text-sm text-[color:var(--muted)]">From</p>
+          <p className="font-medium text-[color:var(--text)]">
+            {reply.lead.company}
+          </p>
+          <p className="text-sm text-[color:var(--muted)]">{reply.fromEmail}</p>
         </div>
 
         <div>
-          <p className="text-sm text-gray-600">Sentiment</p>
+          <p className="text-sm text-[color:var(--muted)]">Sentiment</p>
           <Badge
             variant={
               reply.sentiment === "POSITIVE"
@@ -211,19 +330,23 @@ function ReplyDetailModal({
         </div>
 
         <div>
-          <p className="text-sm text-gray-600 mb-1">Subject</p>
-          <p className="font-medium">{reply.subject}</p>
+          <p className="text-sm text-[color:var(--muted)] mb-1">Subject</p>
+          <p className="font-medium text-[color:var(--text)]">
+            {reply.subject}
+          </p>
         </div>
 
         <div>
-          <p className="text-sm text-gray-600 mb-1">Message</p>
-          <div className="bg-gray-50 rounded-lg p-4 whitespace-pre-wrap text-sm">
+          <p className="text-sm text-[color:var(--muted)] mb-1">Message</p>
+          <div className="bg-white/5 border border-[color:var(--border)] rounded-lg p-4 whitespace-pre-wrap text-sm text-[color:var(--text)]">
             {reply.body}
           </div>
         </div>
 
         <div>
-          <p className="text-sm text-gray-600 mb-2">Quick Reply Templates</p>
+          <p className="text-sm text-[color:var(--muted)] mb-2">
+            Quick Reply Templates
+          </p>
           <div className="space-y-2">
             <QuickReplyButton
               onClick={() =>
@@ -264,7 +387,7 @@ function QuickReplyButton({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm transition-colors"
+      className="w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 rounded text-sm transition-colors border border-[color:var(--border)] text-[color:var(--text)]"
     >
       {children}
     </button>
