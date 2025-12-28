@@ -5,11 +5,11 @@ import { hashPassword } from "@/lib/auth";
 // PATCH /api/users/[id] - Update a user
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { email, password, name, role, isActive } = await request.json();
-    const userId = params.id;
+    const { id: userId } = await params;
 
     const updateData: any = {};
 
@@ -46,10 +46,10 @@ export async function PATCH(
 // DELETE /api/users/[id] - Delete a user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = params.id;
+    const { id: userId } = await params;
 
     // Delete user and associated sessions
     await prisma.user.delete({
