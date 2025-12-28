@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Modal } from "@/components/outreach/Modal";
 import { Button } from "@/components/outreach/Button";
 import { Input, Select } from "@/components/outreach/FormControls";
-import { showToast } from "@/components/outreach/Toast";
+import { useToast } from "@/components/outreach/Toast";
 
 interface User {
   id: string;
@@ -17,6 +17,7 @@ interface User {
 }
 
 export default function UsersPage() {
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
