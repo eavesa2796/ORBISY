@@ -260,6 +260,12 @@ export default function Homepage() {
             >
               Services
             </a>
+            <a
+              href="/login"
+              className="rounded-full border border-[color:var(--border)] bg-white/5 px-4 py-2 text-sm font-semibold text-[color:var(--text)] hover:bg-white/10 transition-colors"
+            >
+              Login
+            </a>
             <CalendlyButton className="cursor-pointer rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
               Book Audit
             </CalendlyButton>
