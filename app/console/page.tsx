@@ -39,7 +39,7 @@ export default function ConsolePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-[color:var(--muted)]">Loading...</div>
       </div>
     );
   }
@@ -58,7 +58,9 @@ export default function ConsolePage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-[color:var(--text)] mb-8">
+        Dashboard
+      </h1>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -119,8 +121,8 @@ export default function ConsolePage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
+        <h2 className="text-xl font-semibold text-[color:var(--text)] mb-4">
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -166,15 +168,17 @@ function StatCard({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-6">
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colorClasses[color] || colorClasses.blue}`}>
+        <div className="p-3 rounded-xl bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]">
           <span className="text-2xl">{icon}</span>
         </div>
       </div>
       <div>
-        <p className="text-3xl font-bold text-gray-900">{value.toLocaleString()}</p>
-        <p className="text-sm text-gray-600 mt-1">{title}</p>
+        <p className="text-3xl font-bold text-[color:var(--text)]">
+          {value.toLocaleString()}
+        </p>
+        <p className="text-sm text-[color:var(--muted)] mt-1">{title}</p>
       </div>
     </div>
   );
@@ -192,10 +196,12 @@ function QuickActionButton({
   return (
     <a
       href={href}
-      className="flex items-center px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+      className="flex items-center px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors border border-[color:var(--border)]"
     >
       <span className="text-xl mr-3">{icon}</span>
-      <span className="text-sm font-medium text-gray-700">{children}</span>
+      <span className="text-sm font-medium text-[color:var(--text)]">
+        {children}
+      </span>
     </a>
   );
 }
