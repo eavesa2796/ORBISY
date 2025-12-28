@@ -42,6 +42,9 @@ export default function ConsoleLayout({
           <NavLink href="/console/inbox" icon="📥">
             Inbox
           </NavLink>
+          <NavLink href="/console/users" icon="👤">
+            Users
+          </NavLink>
           <NavLink href="/console/settings" icon="⚙️">
             Settings
           </NavLink>

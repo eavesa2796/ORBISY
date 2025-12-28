@@ -1,17 +1,47 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Check if user is trying to access /console routes
   if (request.nextUrl.pathname.startsWith("/console")) {
-    // Check for authentication cookie
-    const authToken = request.cookies.get("auth-token")?.value;
-    const expectedToken = process.env.AUTH_TOKEN;
+    // Check for session cookie
+    const sessionToken = request.cookies.get("session-token")?.value;
 
-    // If no auth token or token doesn't match, redirect to login
-    if (!authToken || !expectedToken || authToken !== expectedToken) {
+    if (!sessionToken) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    try {
+      // Validate session from database
+      const session = await prisma.session.findUnique({
+        where: { token: sessionToken },
+        include: { user: true },
+      });
+
+      // Check if session exists, is valid, and user is active
+      if (
+        !session ||
+        session.expiresAt < new Date() ||
+        !session.user.isActive
+      ) {
+        // Delete expired/invalid session
+        if (session) {
+          await prisma.session.delete({ where: { id: session.id } });
+        }
+
+        const loginUrl = new URL("/login", request.url);
+        loginUrl.searchParams.set("callbackUrl", request.nextUrl.pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      // Session is valid, allow access
+      return NextResponse.next();
+    } catch (error) {
+      console.error("Middleware error:", error);
+      const loginUrl = new URL("/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
   }

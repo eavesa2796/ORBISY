@@ -1,10 +1,27 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export async function POST() {
-  const response = NextResponse.json({ success: true });
+export async function POST(request: NextRequest) {
+  try {
+    const sessionToken = request.cookies.get("session-token")?.value;
 
-  // Clear the auth cookie
-  response.cookies.delete("auth-token");
+    if (sessionToken) {
+      // Delete session from database
+      await prisma.session.deleteMany({
+        where: { token: sessionToken },
+      });
+    }
 
-  return response;
+    const response = NextResponse.json({ success: true });
+
+    // Clear the session cookie
+    response.cookies.delete("session-token");
+
+    return response;
+  } catch (error) {
+    console.error("Logout error:", error);
+    const response = NextResponse.json({ success: true });
+    response.cookies.delete("session-token");
+    return response;
+  }
 }
