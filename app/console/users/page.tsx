@@ -40,7 +40,7 @@ export default function UsersPage() {
       const data = await response.json();
       setUsers(data.users || []);
     } catch (error) {
-      showToast("Failed to load users", "error");
+      showToast({ message: "Failed to load users", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function UsersPage() {
         });
 
         if (!response.ok) throw new Error();
-        showToast("User updated successfully", "success");
+        showToast({ message: "User updated successfully", type: "success" });
       } else {
         // Create user
         const response = await fetch("/api/users", {
@@ -97,13 +97,16 @@ export default function UsersPage() {
           const error = await response.json();
           throw new Error(error.error);
         }
-        showToast("User created successfully", "success");
+        showToast({ message: "User created successfully", type: "success" });
       }
 
       setShowModal(false);
       loadUsers();
     } catch (error: any) {
-      showToast(error.message || "Failed to save user", "error");
+      showToast({
+        message: error.message || "Failed to save user",
+        type: "error",
+      });
     }
   };
 
@@ -116,10 +119,10 @@ export default function UsersPage() {
       });
 
       if (!response.ok) throw new Error();
-      showToast("User deleted successfully", "success");
+      showToast({ message: "User deleted successfully", type: "success" });
       loadUsers();
     } catch (error) {
-      showToast("Failed to delete user", "error");
+      showToast({ message: "Failed to delete user", type: "error" });
     }
   };
 
@@ -132,13 +135,13 @@ export default function UsersPage() {
       });
 
       if (!response.ok) throw new Error();
-      showToast(
-        user.isActive ? "User deactivated" : "User activated",
-        "success"
-      );
+      showToast({
+        message: user.isActive ? "User deactivated" : "User activated",
+        type: "success",
+      });
       loadUsers();
     } catch (error) {
-      showToast("Failed to update user", "error");
+      showToast({ message: "Failed to update user", type: "error" });
     }
   };
 
