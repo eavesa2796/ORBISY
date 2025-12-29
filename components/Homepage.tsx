@@ -292,7 +292,7 @@ export default function Homepage() {
         </h1>
 
         <p className="mx-auto mt-3 max-w-[70ch] text-[color:var(--muted)]">
-          Orbisy installs automated lead capture and follow-up systems for
+          ORBISY installs automated lead capture and follow-up systems for
           growing HVAC companies so you never miss a call, lead, or booking
           opportunity.
         </p>
