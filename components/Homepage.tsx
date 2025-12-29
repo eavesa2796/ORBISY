@@ -20,162 +20,172 @@ type Service = {
 const services: Service[] = [
   {
     id: "automation",
-    tab: "Lead Follow-Up & Automations",
-    kicker: "Stop losing leads",
-    title: "Instant replies + reminders so every lead gets handled",
-    sub: "Local businesses lose customers when leads sit too long. We set up simple automations that respond immediately, notify your team, and keep follow-ups from slipping through the cracks.",
+    tab: "HVAC Lead Capture & Booking System",
+    kicker: "Never miss another booking opportunity",
+    title:
+      "Capture every call, text, and web lead — then follow up automatically",
+    sub: "HVAC companies lose revenue when calls go to voicemail, estimates sit unanswered, and leads scatter across phones and inboxes. We install a centralized system that responds instantly, tracks every lead, and automates follow-ups so more inquiries become booked jobs.",
     chips: [
-      "Website forms",
-      "Instagram DMs",
-      "Email/SMS alerts",
-      "Zapier/Make",
+      "Missed-call text-back",
+      "Call tracking",
+      "Centralized CRM",
+      "Automated SMS/Email",
     ],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
+      { label: "Book a Free Growth Call", href: "#book", variant: "primary" },
       { label: "See How It Works", href: "#workflows", variant: "ghost" },
     ],
     highlights: [
       {
-        title: "What we automate first",
+        title: "What we fix first",
         bullets: [
-          "Instant auto-reply to new leads (so they don’t bounce)",
-          "Owner alerts when a lead comes in",
-          "Follow-up reminders until the lead is contacted",
+          "Missed calls after hours or during peak season — instant text-back so leads don't call your competitor",
+          "Estimates sent but never followed up — automated reminders until they book",
+          "Leads scattered across phones, emails, and spreadsheets — one dashboard with full visibility",
+          "No tracking of which leads turn into booked jobs — simple reporting so you know what's working",
         ],
       },
       {
-        title: "Built for local reality",
+        title: "Built for growing HVAC companies",
         bullets: [
-          "Works with what you already use",
-          "No complicated “software rollout”",
-          "Clear documentation so you’re not dependent on us",
+          "Works with your existing phone system and tools",
+          "No complicated software rollout or staff training",
+          "Clear documentation so you're never dependent on us",
+          "Scales as you add more technicians",
         ],
       },
     ],
     table: {
-      title: "72-hour lead fix (typical)",
+      title: "Typical installation timeline",
       rows: [
-        ["Day 1", "Audit lead sources + map follow-up flow", "You + me"],
-        ["Day 2", "Build automations + notifications + tracking", "Me"],
-        ["Day 3", "Test, tune messaging, go-live", "You + me"],
+        ["Week 1", "Audit current lead flow and booking process", "You + us"],
+        ["Week 2", "Install and customize your HVAC booking system", "Us"],
+        ["Week 3", "Monitor bookings and optimize follow-ups", "You + us"],
       ],
     },
     cards3: [
       {
         title: "What you get",
-        text: "A lead follow-up system that responds fast, keeps your team accountable, and prevents missed opportunities.",
+        text: "A complete HVAC lead capture and booking system that responds instantly, keeps your team accountable, and prevents missed opportunities. Every lead gets tracked from first contact to booked job.",
       },
       {
         title: "Best for",
-        text: "Local service businesses where speed-to-lead matters (calls, website forms, IG).",
+        text: "HVAC companies with 5–20 technicians who are growing fast and can't afford to miss calls or lose leads to slow follow-up.",
       },
       {
         title: "Typical outcome",
-        text: "More booked jobs without spending more on ads—because you stop leaking leads.",
+        text: "20–40% increase in booked jobs within 60 days without spending more on ads — because you stop leaking leads and follow up consistently.",
       },
     ],
   },
   {
     id: "websites",
-    tab: "Websites & Lead Capture",
-    kicker: "Turn visitors into booked jobs",
-    title: "A fast homepage that converts—and routes leads correctly",
-    sub: "Most websites look fine but leak leads. We build a clean, mobile-first site with clear messaging, strong CTAs, and reliable lead routing so you can respond fast.",
-    chips: ["Next.js", "Local SEO basics", "Forms/Booking", "Analytics"],
+    tab: "HVAC Website & Online Booking",
+    kicker: "Turn website visitors into booked jobs",
+    title:
+      "A fast HVAC website that converts — with online booking and estimate requests",
+    sub: "Most HVAC websites look fine but don't convert. We build a mobile-first site with clear messaging, strong CTAs, online booking, and reliable lead routing so customers can book service 24/7 and your team responds fast.",
+    chips: ["Next.js", "Online booking", "Google integration", "Mobile-first"],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
+      { label: "Book a Free Growth Call", href: "#book", variant: "primary" },
       { label: "What’s Included", href: "#sections", variant: "ghost" },
     ],
     highlights: [
       {
         title: "Included",
         bullets: [
-          "Conversion-first homepage sections",
-          "Lead form routed to email/CRM + auto-reply",
-          "Speed + basic SEO setup",
+          "Conversion-focused homepage built for HVAC companies",
+          "Online booking and estimate request forms",
+          "Lead routing to your CRM with instant auto-reply",
+          "Google Business Profile integration",
+          "Speed optimization + basic SEO setup",
         ],
       },
       {
         title: "Optional add-ons",
         bullets: [
-          "Online booking",
-          "Reviews widget + social proof",
-          "Location/Service landing pages",
+          "Service area landing pages (AC repair, heating, etc.)",
+          "Customer reviews widget and social proof",
+          "Maintenance plan signup forms",
+          "Emergency service CTAs",
         ],
       },
     ],
     table: {
-      title: "Homepage launch timeline (example)",
+      title: "Website launch timeline (typical)",
       rows: [
-        ["Week 1", "Copy + layout + approval", "Draft to final"],
-        ["Week 2", "Build + mobile QA", "Staging link"],
-        ["Week 3", "Go-live + tracking", "Post-launch tweaks"],
+        ["Week 1", "Copy, layout, and messaging approval", "Draft to final"],
+        ["Week 2", "Build site + mobile QA + booking setup", "Staging link"],
+        ["Week 3", "Go-live + tracking + post-launch tweaks", "Live site"],
       ],
     },
     cards3: [
       {
         title: "What you get",
-        text: "A homepage designed to get calls/messages, not just look good—and a lead pipeline you can actually track.",
+        text: "An HVAC website designed to book jobs 24/7, not just look good — plus a lead pipeline you can track from website visit to completed job.",
       },
       {
         title: "Best for",
-        text: "Trades and local services that win by responding faster than competitors.",
+        text: "Growing HVAC companies that want to capture more online leads and let customers book service without calling during business hours.",
       },
       {
         title: "Typical outcome",
-        text: "More inquiries convert to booked work because follow-up is automatic and consistent.",
+        text: "More inquiries convert to booked jobs because customers can book instantly and follow-up is automatic and consistent.",
       },
     ],
   },
   {
     id: "ops",
-    tab: "Dashboards & Ops Tools",
-    kicker: "Clarity for the day-to-day",
-    title: "Simple tools for scheduling, jobs, and visibility",
-    sub: "When operations live in texts and spreadsheets, things get missed. We build lightweight dashboards and internal tools that match how your team actually works.",
-    chips: ["Postgres", "Admin UI", "Exports", "Audit trails"],
+    tab: "HVAC Dashboards & Job Tracking",
+    kicker: "Clarity for your daily operations",
+    title:
+      "Simple dashboards for scheduling, job tracking, and team visibility",
+    sub: "When operations live in texts, spreadsheets, and sticky notes, jobs get missed and technicians lose time. We build lightweight dashboards that match how HVAC teams actually work — so everyone knows what's scheduled, what's in progress, and what needs follow-up.",
+    chips: ["Job tracker", "Daily KPIs", "Technician schedules", "Reporting"],
     ctas: [
-      { label: "Book a Free Lead Audit", href: "#book", variant: "primary" },
+      { label: "Book a Free Growth Call", href: "#book", variant: "primary" },
       { label: "See Example Tools", href: "#dashboard", variant: "ghost" },
     ],
     highlights: [
       {
-        title: "Common builds",
+        title: "Common builds for HVAC",
         bullets: [
-          "Job tracker (status, owner, next step)",
-          "Daily KPI dashboard",
-          "Inventory + reorder alerts",
+          "Job tracker (status, assigned tech, next step)",
+          "Daily KPI dashboard (calls, bookings, revenue)",
+          "Technician schedule view (mobile-friendly)",
+          "Parts inventory + reorder alerts",
         ],
       },
       {
-        title: "Designed for adoption",
+        title: "Designed for field teams",
         bullets: [
-          "Works on phones/tablets",
-          "Simple permissions",
-          "Documentation + training included",
+          "Works on phones and tablets in the truck",
+          "Simple permissions by role (owner, dispatcher, tech)",
+          "Documentation and training included",
+          "Integrates with your existing systems",
         ],
       },
     ],
     table: {
-      title: "MVP build plan (example)",
+      title: "Dashboard build plan (example)",
       rows: [
         ["Week 1", "Requirements + wireframes", "Screens + data model"],
-        ["Week 2", "Build MVP", "Core flows working"],
-        ["Week 3", "Polish + training", "Go-live + handoff"],
+        ["Week 2", "Build MVP dashboard", "Core flows working"],
+        ["Week 3", "Polish + team training", "Go-live + handoff"],
       ],
     },
     cards3: [
       {
         title: "What you get",
-        text: "A focused tool that matches your workflow so the team actually uses it (and stops improvising).",
+        text: "A focused dashboard that matches your HVAC workflow so the team actually uses it — and stops improvising with texts and paper.",
       },
       {
         title: "Best for",
-        text: "Businesses juggling jobs, schedules, and follow-ups across too many places.",
+        text: "HVAC companies juggling multiple jobs, technicians, and follow-ups across too many tools and losing visibility.",
       },
       {
         title: "Typical outcome",
-        text: "Fewer missed steps, faster handoffs, and clearer ownership—without enterprise complexity.",
+        text: "Fewer missed jobs, faster handoffs, and clearer accountability — without expensive enterprise software your team won't use.",
       },
     ],
   },
@@ -241,7 +251,7 @@ export default function Homepage() {
     <div className="min-h-screen text-[color:var(--text)] antialiased bg-[linear-gradient(180deg,var(--bg),#0a0f1b_40%,#090d17)]">
       <header className="mx-auto max-w-[1100px] px-5 pb-5 text-center">
         <div className="mb-8 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-3 no-underline">
+          <a href="/" className="flex items-center gap-3 no-underline">
             <span className="sr-only">ORBISY</span>
             <Image
               src="/orbisy-logo.png"
@@ -267,28 +277,29 @@ export default function Homepage() {
               Login
             </a>
             <CalendlyButton className="cursor-pointer rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
-              Book Audit
+              Book Call
             </CalendlyButton>
           </div>
         </div>
 
         <div className="text-[color:var(--muted)] font-semibold tracking-[.12em] uppercase">
-          Built for Local Service Businesses
+          Built for Growing HVAC Companies
         </div>
 
         <h1 className="mt-2 text-[clamp(28px,4vw,44px)] leading-[1.1] font-extrabold">
-          Stop losing leads from your website & Instagram.
+          Book 20–40% More HVAC Jobs in 60 Days — Without Hiring More Office
+          Staff
         </h1>
 
         <p className="mx-auto mt-3 max-w-[70ch] text-[color:var(--muted)]">
-          ORBISY helps local businesses capture every lead, respond instantly,
-          and track follow-ups so more inquiries turn into booked jobs—without
-          expensive software or complicated setups.
+          Orbisy installs automated lead capture and follow-up systems for
+          growing HVAC companies so you never miss a call, lead, or booking
+          opportunity.
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <CalendlyButton className="cursor-pointer inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] shadow-[var(--shadow)] bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001]">
-            Book a Free Lead Audit →
+            Book a Free Growth Call →
           </CalendlyButton>
           <a
             className="inline-flex items-center gap-2 rounded-xl px-4 py-3 font-bold border border-[color:var(--border)] bg-transparent text-[color:var(--text)]"
@@ -302,12 +313,12 @@ export default function Homepage() {
           {/* Chips */}
           <div className="flex flex-wrap items-center justify-center gap-2 px-2">
             {[
-              "Plumbers",
-              "HVAC",
-              "Electricians",
-              "Med spas",
-              "Clinics & practices",
-              "Contractors",
+              "5–20 technicians",
+              "Residential HVAC",
+              "Commercial HVAC",
+              "Heating & Cooling",
+              "Emergency Service",
+              "Maintenance Plans",
             ].map((t) => (
               <span
                 key={t}
@@ -320,8 +331,8 @@ export default function Homepage() {
 
           {/* Pricing line */}
           <p className="text-center text-sm text-[color:var(--muted)]">
-            Most Lead Follow-Up Fix setups start at{" "}
-            <strong>$750 one-time</strong>.
+            Best for HVAC companies doing at least <strong>$500k/year</strong>{" "}
+            in revenue.
           </p>
         </div>
       </header>
@@ -516,18 +527,24 @@ export default function Homepage() {
                     id="book"
                   >
                     <h2 className="text-[clamp(20px,3vw,26px)] font-extrabold">
-                      Book a free lead audit
+                      Book a Free 30-Minute HVAC Growth Call
                     </h2>
                     <p className="mt-2 text-[color:var(--muted)] max-w-[80ch]">
-                      I’ll review how leads come in from your website and
-                      Instagram (and how fast they’re handled). You’ll get a
-                      short action plan you can implement immediately—whether
-                      you work with ORBISY or not.
+                      We'll review your current lead flow and show you exactly
+                      where booking opportunities are being missed. You'll get a
+                      clear action plan to increase booked jobs—whether you work
+                      with us or not.
+                    </p>
+                    <p className="mt-2 text-[color:var(--muted)] text-sm">
+                      <strong>Best for:</strong> HVAC companies with 5–20
+                      technicians doing at least $500k/year in revenue.
                     </p>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
-                        <h3 className="text-lg font-bold">Request the audit</h3>
+                        <h3 className="text-lg font-bold">
+                          Request your free call
+                        </h3>
                         <form className="mt-3 grid gap-3" onSubmit={onSubmit}>
                           <input
                             name="website"
@@ -544,7 +561,7 @@ export default function Homepage() {
                             <input
                               name="businessName"
                               className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] px-3 py-2 outline-none focus:ring-2 focus:ring-white/20"
-                              placeholder="Acme Electric"
+                              placeholder="Acme HVAC"
                             />
                           </label>
 
@@ -563,13 +580,13 @@ export default function Homepage() {
 
                           <label className="grid gap-1">
                             <span className="text-sm text-[color:var(--muted)]">
-                              What happens when a lead comes in?
+                              Tell us about your current lead process
                             </span>
                             <textarea
                               name="message"
                               required
                               className="min-h-[96px] rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] px-3 py-2 outline-none focus:ring-2 focus:ring-white/20"
-                              placeholder="Leads come from our website + IG DMs. Response time varies…"
+                              placeholder="Example: Calls come in during the day, some go to voicemail after hours. We send estimates but don't always follow up…"
                             />
                           </label>
 
@@ -578,7 +595,7 @@ export default function Homepage() {
                             type="submit"
                             disabled={sending}
                           >
-                            {sending ? "Sending..." : "Request audit"}{" "}
+                            {sending ? "Sending..." : "Book My Free Call"}{" "}
                             <span aria-hidden>→</span>
                           </button>
 
@@ -598,11 +615,22 @@ export default function Homepage() {
                       <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
                         <h3 className="text-lg font-bold">What you’ll get</h3>
                         <ul className="mt-2 list-disc pl-5 text-[color:var(--muted)]">
-                          <li>15–20 minute call</li>
-                          <li>Where leads are being missed (if anywhere)</li>
-                          <li>Recommended “72-hour fix” plan</li>
-                          <li>Clear next steps (with or without us)</li>
+                          <li>30-minute HVAC growth call</li>
+                          <li>
+                            Analysis of where you're losing booking
+                            opportunities
+                          </li>
+                          <li>Clear action plan to increase booked jobs</li>
+                          <li>Next steps (whether you work with us or not)</li>
                         </ul>
+
+                        <div className="mt-4 rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
+                          <h4 className="font-bold">Our guarantee</h4>
+                          <p className="mt-1 text-[color:var(--muted)] text-sm">
+                            If you don't see a measurable increase in booked
+                            jobs within 60 days, we work for free until you do.
+                          </p>
+                        </div>
 
                         <div className="mt-4 rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
                           <h4 className="font-bold">Prefer email?</h4>
@@ -635,24 +663,29 @@ export default function Homepage() {
               <div className="mt-3 grid gap-4 md:grid-cols-2">
                 <div>
                   <p className="text-[color:var(--muted)]">
-                    Most local businesses don’t need “more leads”—they need to
+                    Most HVAC companies don't need "more leads"—they need to
                     stop losing the ones they already get. We start by fixing
-                    speed-to-lead and follow-up, then expand only if it’s paying
-                    for itself.
+                    your lead capture and follow-up process, then optimize for
+                    maximum bookings.
                   </p>
                   <ol className="mt-3 list-decimal pl-5 text-[color:var(--muted)]">
-                    <li>Audit your lead sources (website + Instagram)</li>
-                    <li>Set up instant replies + owner alerts</li>
-                    <li>Track follow-up so nothing slips</li>
+                    <li>Audit your current lead flow and booking process</li>
+                    <li>Install and customize your HVAC booking system</li>
+                    <li>Monitor bookings and optimize follow-ups</li>
                   </ol>
                 </div>
                 <div className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4">
                   <h3 className="text-lg font-bold">Good fit if you…</h3>
                   <ul className="mt-2 list-disc pl-5 text-[color:var(--muted)]">
-                    <li>Get leads but response time varies</li>
-                    <li>Have website forms + IG DMs in different places</li>
-                    <li>Lose jobs because follow-up isn’t consistent</li>
+                    <li>Have 5–20 technicians and doing $500k+/year</li>
+                    <li>Miss calls after hours or during peak demand</li>
+                    <li>Send estimates but follow-up isn't consistent</li>
+                    <li>Lose visibility on which leads become booked jobs</li>
                   </ul>
+                  <p className="mt-3 text-[color:var(--muted)] text-sm italic">
+                    Every missed call or forgotten follow-up is revenue going to
+                    your competitors.
+                  </p>
                 </div>
               </div>
             </div>
