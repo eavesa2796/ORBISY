@@ -692,7 +692,7 @@ export default function Homepage() {
                             </a>
                             <br />
                             <span className="text-[color:var(--muted)]">
-                              (331) 703-4585
+                              (224) 323-6231
                             </span>
                           </p>
                         </div>
