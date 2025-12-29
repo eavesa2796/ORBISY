@@ -247,6 +247,8 @@ export default function Homepage() {
     if (pushHash) window.history.replaceState(null, "", `#${id}`);
   };
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen text-[color:var(--text)] antialiased bg-[linear-gradient(180deg,var(--bg),#0a0f1b_40%,#090d17)]">
       <header className="mx-auto max-w-[1100px] px-5 pb-5 text-center">
@@ -259,14 +261,15 @@ export default function Homepage() {
               width={260}
               height={80}
               priority
-              className="mx-auto h-20 w-auto sm:h-24"
+              className="h-16 w-auto sm:h-20"
             />
           </a>
 
-          <div className="flex items-center gap-2">
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-2">
             <a
               href="#services"
-              className="rounded-full border border-[color:var(--border)] bg-white/5 px-4 py-2 text-sm font-semibold text-[color:var(--text)]"
+              className="rounded-full border border-[color:var(--border)] bg-white/5 px-4 py-2 text-sm font-semibold text-[color:var(--text)] hover:bg-white/10 transition-colors"
             >
               Services
             </a>
@@ -276,11 +279,57 @@ export default function Homepage() {
             >
               Login
             </a>
-            <CalendlyButton className="cursor-pointer rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001]">
+            <CalendlyButton className="cursor-pointer rounded-full border border-transparent bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-2 text-sm font-bold text-[#001] hover:opacity-90 transition-opacity">
               Book Call
             </CalendlyButton>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg border border-[color:var(--border)] bg-white/5 hover:bg-white/10 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`block w-5 h-0.5 bg-[color:var(--text)] transition-all ${
+                mobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+              }`}
+            ></span>
+            <span
+              className={`block w-5 h-0.5 bg-[color:var(--text)] mt-1 transition-all ${
+                mobileMenuOpen ? "opacity-0" : ""
+              }`}
+            ></span>
+            <span
+              className={`block w-5 h-0.5 bg-[color:var(--text)] mt-1 transition-all ${
+                mobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+              }`}
+            ></span>
+          </button>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mb-6 rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            <a
+              href="#services"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-4 py-3 rounded-lg text-[color:var(--text)] hover:bg-white/5 transition-colors font-semibold"
+            >
+              Services
+            </a>
+            <a
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-4 py-3 rounded-lg text-[color:var(--text)] hover:bg-white/5 transition-colors font-semibold"
+            >
+              Login
+            </a>
+            <CalendlyButton className="cursor-pointer w-full block px-4 py-3 rounded-lg bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] text-[#001] font-bold hover:opacity-90 transition-opacity">
+              Book Call
+            </CalendlyButton>
+          </div>
+        )}
 
         <div className="text-[color:var(--muted)] font-semibold tracking-[.12em] uppercase">
           Built for Growing HVAC Companies
