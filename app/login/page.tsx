@@ -3,6 +3,7 @@
 import { useState, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = "force-dynamic";
@@ -48,9 +49,16 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="bg-[color:var(--panel)] border border-[color:var(--border)] rounded-[var(--radius)] shadow-[var(--shadow)] p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[color:var(--text)] mb-2">
-              ORBISY Console
-            </h1>
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/orbisy-logo.png"
+                alt="ORBISY"
+                width={200}
+                height={61}
+                priority
+                className="w-auto h-24"
+              />
+            </div>
             <p className="text-[color:var(--muted)]">Sign in to continue</p>
           </div>
 

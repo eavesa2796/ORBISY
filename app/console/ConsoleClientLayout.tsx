@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/outreach/Toast";
 
@@ -26,10 +27,15 @@ export default function ConsoleClientLayout({
 
       {/* Sidebar */}
       <div className="fixed inset-y-0 left-0 w-64 bg-[color:var(--panel)] border-r border-[color:var(--border)]">
-        <div className="flex items-center justify-center h-16 border-b border-[color:var(--border)]">
-          <h1 className="text-xl font-bold text-[color:var(--text)]">
-            ORBISY Console
-          </h1>
+        <div className="flex items-center justify-center h-16 border-b border-[color:var(--border)] px-4">
+          <Image
+            src="/orbisy-logo.png"
+            alt="ORBISY"
+            width={150}
+            height={46}
+            priority
+            className="w-auto h-10"
+          />
         </div>
 
         <nav className="mt-8 px-4 space-y-2">
