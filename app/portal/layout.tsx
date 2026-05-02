@@ -12,7 +12,7 @@ export default async function PortalLayout({
     redirect("/login?callbackUrl=/portal");
   }
 
-  if (session.userRole !== "CUSTOMER") {
+  if (session.userRole !== "HOMEOWNER") {
     redirect("/console");
   }
 

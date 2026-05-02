@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { NextRequest } from "next/server";
 import { CATALOG_CSV_COLUMNS } from "@/lib/sales/catalog/csv";
 
 const { requireInternalUserMock, authErrorToHttpMock, findManyMock } =
@@ -28,7 +29,7 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
     vi.clearAllMocks();
     requireInternalUserMock.mockResolvedValue({
       userId: "user_1",
-      userRole: "SALES",
+      userRole: "HVAC_SALES",
     });
     authErrorToHttpMock.mockReturnValue(null);
   });
@@ -70,7 +71,7 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
     const response = await GET(
       new Request(
         "https://app.orbisy.com/api/sales-machine/catalog/export-csv",
-      ) as any,
+      ) as unknown as NextRequest,
     );
     const csv = await response.text();
     const [header, firstRow, secondRow] = csv.split("\n");
@@ -108,7 +109,7 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
     const response = await GET(
       new Request(
         "https://app.orbisy.com/api/sales-machine/catalog/export-csv?activeOnly=true",
-      ) as any,
+      ) as unknown as NextRequest,
     );
     const csv = await response.text();
     const [, onlyRow] = csv.split("\n");

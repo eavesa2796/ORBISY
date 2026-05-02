@@ -9,9 +9,11 @@ datasource db {
 // ==================== AUTHENTICATION ====================
 
 enum UserRole {
-  ADMIN
-  SALES
-  CUSTOMER
+  ORBISY_ADMIN
+  ORBISY_SALES
+  HVAC_OWNER
+  HVAC_SALES
+  HOMEOWNER
 }
 
 model User {
@@ -19,7 +21,7 @@ model User {
   email              String       @unique
   password           String       // Hashed password
   name               String
-  role               UserRole     @default(SALES)
+  role               UserRole     @default(ORBISY_SALES)
   isActive           Boolean      @default(true)
   customerCompanyId  String?
   customerContactId  String?

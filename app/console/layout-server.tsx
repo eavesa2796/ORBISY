@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { validateSession } from "@/lib/session";
+import { isHvacRole, isOrbisyRole, validateSession } from "@/lib/session";
 import ConsoleClientLayout from "./ConsoleClientLayout";
 
 export default async function ConsoleLayout({
@@ -15,9 +15,16 @@ export default async function ConsoleLayout({
     redirect("/login");
   }
 
-  if (session.userRole !== "ADMIN" && session.userRole !== "SALES") {
+  if (!isOrbisyRole(session.userRole)) {
+    if (isHvacRole(session.userRole)) {
+      redirect("/pro");
+    }
     redirect("/portal");
   }
 
-  return <ConsoleClientLayout>{children}</ConsoleClientLayout>;
+  return (
+    <ConsoleClientLayout currentUserRole={session.userRole}>
+      {children}
+    </ConsoleClientLayout>
+  );
 }

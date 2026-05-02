@@ -5,7 +5,27 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-export type AppUserRole = "ADMIN" | "SALES" | "CUSTOMER";
+export type AppUserRole =
+  | "ORBISY_ADMIN"
+  | "ORBISY_SALES"
+  | "HVAC_OWNER"
+  | "HVAC_SALES"
+  | "HOMEOWNER";
+
+const ORBISY_ROLES: AppUserRole[] = ["ORBISY_ADMIN", "ORBISY_SALES"];
+const HVAC_ROLES: AppUserRole[] = ["HVAC_OWNER", "HVAC_SALES"];
+
+export function isOrbisyRole(role: AppUserRole) {
+  return ORBISY_ROLES.includes(role);
+}
+
+export function isHvacRole(role: AppUserRole) {
+  return HVAC_ROLES.includes(role);
+}
+
+export function isWorkspaceRole(role: AppUserRole) {
+  return isOrbisyRole(role) || isHvacRole(role);
+}
 
 export interface ValidatedSession {
   userId: string;
@@ -92,40 +112,76 @@ export async function requireSession(): Promise<ValidatedSession> {
 }
 
 /**
- * Require admin role or throw an error
- * Use this in API routes that require admin access
+ * Require ORBISY platform admin role or throw an error.
  */
-export async function requireAdmin(): Promise<ValidatedSession> {
+export async function requireOrbisyAdmin(): Promise<ValidatedSession> {
   const session = await requireSession();
-  if (session.userRole !== "ADMIN") {
+  if (session.userRole !== "ORBISY_ADMIN") {
     throw new AuthError("Forbidden", 403);
   }
   return session;
 }
 
 /**
- * Require an internal user (ADMIN or SALES) for sales-engine operations.
+ * Backward-compatible alias for routes that have not been renamed yet.
+ */
+export async function requireAdmin(): Promise<ValidatedSession> {
+  return requireOrbisyAdmin();
+}
+
+/**
+ * Require an ORBISY platform team member.
+ */
+export async function requireOrbisyUser(): Promise<ValidatedSession> {
+  const session = await requireSession();
+  if (!isOrbisyRole(session.userRole)) {
+    throw new AuthError("Forbidden", 403);
+  }
+  return session;
+}
+
+/**
+ * Require an HVAC company user.
+ */
+export async function requireHvacUser(): Promise<ValidatedSession> {
+  const session = await requireSession();
+  if (!isHvacRole(session.userRole)) {
+    throw new AuthError("Forbidden", 403);
+  }
+  return session;
+}
+
+/**
+ * Require an ORBISY or HVAC workspace user.
+ * This preserves legacy /console routes while the app is split into /console and /pro.
  */
 export async function requireInternalUser(): Promise<ValidatedSession> {
   const session = await requireSession();
-  if (session.userRole !== "ADMIN" && session.userRole !== "SALES") {
+  if (!isWorkspaceRole(session.userRole)) {
     throw new AuthError("Forbidden", 403);
   }
   return session;
 }
 
 /**
- * Require a customer user and ensure they're linked to a company/contact.
+ * Require a homeowner user and ensure they're linked to a company/contact.
  */
-export async function requireCustomerUser(): Promise<ValidatedSession> {
+export async function requireHomeownerUser(): Promise<ValidatedSession> {
   const session = await requireSession();
-  if (session.userRole !== "CUSTOMER") {
+  if (session.userRole !== "HOMEOWNER") {
     throw new AuthError("Forbidden", 403);
   }
   if (!session.customerCompanyId && !session.customerContactId) {
-    throw new AuthError("Customer user is not linked to company/contact", 403);
+    throw new AuthError("Homeowner user is not linked to company/contact", 403);
   }
   return session;
+}
+
+/**
+ * Backward-compatible alias for existing portal/customer APIs.
+ */
+export async function requireCustomerUser(): Promise<ValidatedSession> {
+  return requireHomeownerUser();
 }
 
 /**
@@ -139,7 +195,7 @@ export function requireCustomerResourceAccess(
     contactId?: string | null;
   },
 ) {
-  if (session.userRole !== "CUSTOMER") {
+  if (session.userRole !== "HOMEOWNER") {
     throw new AuthError("Forbidden", 403);
   }
 

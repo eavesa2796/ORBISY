@@ -1,4 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {},
+}));
+
 import {
   AuthError,
   type ValidatedSession,
@@ -8,8 +13,8 @@ import {
 const baseCustomerSession: ValidatedSession = {
   userId: "user_1",
   userEmail: "customer@example.com",
-  userName: "Customer User",
-  userRole: "CUSTOMER",
+  userName: "Homeowner User",
+  userRole: "HOMEOWNER",
   customerCompanyId: "company_1",
   customerContactId: "contact_1",
 };
@@ -45,7 +50,7 @@ describe("requireCustomerResourceAccess", () => {
   it("rejects non-customer users", () => {
     const internalSession: ValidatedSession = {
       ...baseCustomerSession,
-      userRole: "SALES",
+      userRole: "ORBISY_SALES",
     };
 
     expect(() =>

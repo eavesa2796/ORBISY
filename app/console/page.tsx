@@ -151,12 +151,9 @@ export default function ConsolePage() {
             <p className="text-3xl font-bold mt-2 text-yellow-400">
               {(m?.proposalsNeedingFollowUp ?? 0).toLocaleString()}
             </p>
-            <a
-              href="/console/proposals#proposal-history"
-              className="mt-3 inline-flex text-sm font-semibold text-[color:var(--accent)] hover:opacity-90"
-            >
-              Open Proposal History
-            </a>
+            <p className="mt-3 text-sm font-semibold text-[color:var(--muted)]">
+              Managed in Pro Workspace
+            </p>
           </div>
           <MetricCard
             title="Accepted This Month"
@@ -168,12 +165,9 @@ export default function ConsolePage() {
             <p className="text-3xl font-bold mt-2 text-emerald-400">
               ${(m?.estimatedAcceptedRevenueThisMonth ?? 0).toLocaleString()}
             </p>
-            <a
-              href="/console/proposals#proposal-history"
-              className="mt-3 inline-flex text-sm font-semibold text-[color:var(--accent)] hover:opacity-90"
-            >
-              View Accepted Proposals
-            </a>
+            <p className="mt-3 text-sm font-semibold text-[color:var(--muted)]">
+              Managed in Pro Workspace
+            </p>
           </div>
         </div>
       </div>

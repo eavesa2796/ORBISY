@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { NextRequest } from "next/server";
 import { CATALOG_CSV_COLUMNS } from "@/lib/sales/catalog/csv";
 
 const {
@@ -37,7 +38,7 @@ describe("POST /api/sales-machine/catalog/import-csv", () => {
     vi.clearAllMocks();
     requireInternalUserMock.mockResolvedValue({
       userId: "user_1",
-      userRole: "ADMIN",
+      userRole: "ORBISY_ADMIN",
     });
     authErrorToHttpMock.mockReturnValue(null);
   });
@@ -60,7 +61,7 @@ describe("POST /api/sales-machine/catalog/import-csv", () => {
       },
     );
 
-    const response = await POST(request as any);
+    const response = await POST(request as unknown as NextRequest);
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -103,7 +104,7 @@ describe("POST /api/sales-machine/catalog/import-csv", () => {
       },
     );
 
-    const response = await POST(request as any);
+    const response = await POST(request as unknown as NextRequest);
     const json = await response.json();
 
     expect(response.status).toBe(200);
@@ -131,7 +132,7 @@ describe("POST /api/sales-machine/catalog/import-csv", () => {
       },
     );
 
-    const response = await POST(request as any);
+    const response = await POST(request as unknown as NextRequest);
     const json = await response.json();
 
     expect(response.status).toBe(200);

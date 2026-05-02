@@ -1,5 +1,5 @@
 /**
- * Setup script to create the first admin user
+ * Setup script to create the first ORBISY admin user
  * Run this with: node scripts/create-admin.mjs
  */
 
@@ -23,7 +23,7 @@ function question(query) {
 }
 
 async function main() {
-  console.log("=== Create Admin User ===\n");
+  console.log("=== Create ORBISY Admin User ===\n");
 
   const name = await question("Enter admin name: ");
   const email = await question("Enter admin email: ");
@@ -45,12 +45,12 @@ async function main() {
       email: email.toLowerCase(),
       password: hashPassword(password),
       name,
-      role: "ADMIN",
+      role: "ORBISY_ADMIN",
       isActive: true,
     },
   });
 
-  console.log(`\n✅ Admin user created successfully!`);
+  console.log(`\n✅ ORBISY admin user created successfully!`);
   console.log(`\nUser Details:`);
   console.log(`- Name: ${user.name}`);
   console.log(`- Email: ${user.email}`);

@@ -5,19 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "@/components/outreach/Toast";
 
-type ConsoleRole =
-  | "ORBISY_ADMIN"
-  | "ORBISY_SALES"
-  | "HVAC_OWNER"
-  | "HVAC_SALES"
-  | "HOMEOWNER";
-
-export default function ConsoleClientLayout({
+export default function ProClientLayout({
   children,
-  currentUserRole,
 }: {
   children: React.ReactNode;
-  currentUserRole: ConsoleRole;
 }) {
   const router = useRouter();
 
@@ -47,28 +38,17 @@ export default function ConsoleClientLayout({
         </div>
 
         <nav className="mt-8 px-4 space-y-2">
-          <NavLink href="/console" icon="CC">
-            Command Center
+          <NavLink href="/pro" icon="🏠">
+            Pro Dashboard
           </NavLink>
-          <NavLink href="/console/pipeline" icon="SP">
-            Sales Pipeline
+          <NavLink href="/pro/proposals" icon="🧾">
+            Proposals
           </NavLink>
-          <NavLink href="/console/leads" icon="PR">
-            Prospects
+          <NavLink href="/pro/proposals/settings" icon="⚙️">
+            Proposal Settings
           </NavLink>
-          <NavLink href="/console/campaigns" icon="PB">
-            Playbooks
-          </NavLink>
-          <NavLink href="/console/inbox" icon="RP">
-            Replies
-          </NavLink>
-          {currentUserRole === "ORBISY_ADMIN" && (
-            <NavLink href="/console/users" icon="US">
-              Users
-            </NavLink>
-          )}
-          <NavLink href="/console/settings" icon="SY">
-            System
+          <NavLink href="/portal" icon="👤">
+            Customer Portal
           </NavLink>
         </nav>
 
@@ -77,7 +57,7 @@ export default function ConsoleClientLayout({
             onClick={handleLogout}
             className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-colors text-red-400 font-medium"
           >
-            <span className="mr-2">Exit</span>
+            <span className="mr-2">🚪</span>
             Logout
           </button>
         </div>
@@ -104,9 +84,7 @@ function NavLink({
       href={href}
       className="flex items-center px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-[color:var(--text)] hover:text-[color:var(--accent)]"
     >
-      <span className="mr-3 text-xs font-semibold tracking-wide text-[color:var(--muted)]">
-        {icon}
-      </span>
+      <span className="mr-3">{icon}</span>
       <span>{children}</span>
     </Link>
   );

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateProposalSettingsForm } from "./page";
+import { validateProposalSettingsForm } from "@/components/pro/ProposalSettingsPage";
 
 const validForm = {
   defaultLaborCost: "1500",

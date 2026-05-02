@@ -33,7 +33,7 @@ describe("GET /api/sales-machine/proposals/settings", () => {
     vi.clearAllMocks();
     requireInternalUserMock.mockResolvedValue({
       userId: "user_1",
-      userRole: "ADMIN",
+      userRole: "ORBISY_ADMIN",
     });
     authErrorToHttpMock.mockReturnValue(null);
   });
@@ -62,7 +62,7 @@ describe("PUT /api/sales-machine/proposals/settings", () => {
     vi.clearAllMocks();
     requireInternalUserMock.mockResolvedValue({
       userId: "user_1",
-      userRole: "ADMIN",
+      userRole: "ORBISY_ADMIN",
     });
     authErrorToHttpMock.mockReturnValue(null);
     settingsFindUniqueMock.mockResolvedValue(null);
