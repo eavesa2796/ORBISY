@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ORBISY — Stop Losing HVAC Jobs to Missed Calls and Slow Follow-Up",
+  title: "ORBISY - HVAC proposals and revenue recovery",
   description:
-    "ORBISY installs missed-call text-back, instant lead response, estimate follow-up, and booking tracking for growing HVAC companies. Book more jobs from leads you already have.",
+    "ORBISY helps HVAC teams build Good / Better / Best proposals, send homeowner proposal links, track engagement, and automate follow-up to recover more revenue.",
 };
 
 export default function RootLayout({
