@@ -2,8 +2,13 @@ import { redirect } from "next/navigation";
 import { validateSession } from "@/lib/session";
 import UsersPageClient from "./UsersPageClient";
 
-export default async function UsersPage() {
+export default async function UsersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ companyId?: string; role?: string }>;
+}) {
   const session = await validateSession();
+  const params = searchParams ? await searchParams : {};
 
   if (!session) {
     redirect("/login");
@@ -13,5 +18,10 @@ export default async function UsersPage() {
     redirect("/console");
   }
 
-  return <UsersPageClient />;
+  return (
+    <UsersPageClient
+      defaultCompanyId={params.companyId || ""}
+      defaultRole={params.role || ""}
+    />
+  );
 }

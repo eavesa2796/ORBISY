@@ -123,6 +123,7 @@ export async function GET() {
           name: true,
           city: true,
           state: true,
+          accountStatus: true,
           contacts: {
             select: {
               id: true,

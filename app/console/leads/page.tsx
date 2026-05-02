@@ -8,6 +8,9 @@ type Lead = {
   slug?: string;
   city?: string;
   state?: string;
+  accountStatus: "PROSPECT" | "QUALIFIED" | "PRO_CUSTOMER" | "CHURNED";
+  convertedToCustomerAt: string | null;
+  customerUserCount: number;
   score: number;
   buyingLikelihood: number;
   qualified: boolean;
@@ -29,9 +32,16 @@ export default function ProspectsPage() {
   const [auditStates, setAuditStates] = useState<Record<string, AuditState>>(
     {},
   );
+  const [convertingCompanyId, setConvertingCompanyId] = useState<string | null>(
+    null,
+  );
+  const [conversionMessage, setConversionMessage] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     fetchLeads();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minScore]);
 
   async function fetchLeads() {
@@ -78,6 +88,33 @@ export default function ProspectsPage() {
     }
   }
 
+  async function convertToCustomer(companyId: string) {
+    setConvertingCompanyId(companyId);
+    setConversionMessage(null);
+
+    try {
+      const res = await fetch(
+        `/api/sales-machine/companies/${companyId}/convert-to-customer`,
+        { method: "POST" },
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to convert company");
+      }
+
+      setConversionMessage(
+        `${data.company.name} is now an active ORBISY Pro customer workspace. Invite an HVAC owner from Users.`,
+      );
+      await fetchLeads();
+    } catch (error) {
+      setConversionMessage(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
+    } finally {
+      setConvertingCompanyId(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
@@ -109,6 +146,12 @@ export default function ProspectsPage() {
         </label>
       </div>
 
+      {conversionMessage && (
+        <div className="rounded-xl border border-[color:var(--border)] bg-white/5 px-4 py-3 text-sm text-[color:var(--muted)]">
+          {conversionMessage}
+        </div>
+      )}
+
       {loading ? (
         <p className="text-[color:var(--muted)]">Loading prospects...</p>
       ) : leads.length === 0 ? (
@@ -131,6 +174,17 @@ export default function ProspectsPage() {
                     {[lead.city, lead.state].filter(Boolean).join(", ") ||
                       "Unknown location"}
                   </p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-[color:var(--border)] bg-white/5 px-3 py-1 text-[color:var(--muted)]">
+                      {accountStatusLabel(lead.accountStatus)}
+                    </span>
+                    {lead.customerUserCount > 0 && (
+                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-emerald-300">
+                        {lead.customerUserCount} workspace user
+                        {lead.customerUserCount === 1 ? "" : "s"}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-2xl font-bold text-[color:var(--accent)]">
@@ -220,6 +274,25 @@ export default function ProspectsPage() {
                     Open Public Audit
                   </a>
                 ) : null}
+                {lead.accountStatus !== "PRO_CUSTOMER" ? (
+                  <button
+                    type="button"
+                    onClick={() => convertToCustomer(lead.companyId)}
+                    disabled={convertingCompanyId === lead.companyId}
+                    className="rounded-lg border border-emerald-400/40 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300 transition-colors hover:bg-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {convertingCompanyId === lead.companyId
+                      ? "Converting..."
+                      : "Convert to Pro Customer"}
+                  </button>
+                ) : (
+                  <a
+                    href={`/console/users?role=HVAC_OWNER&companyId=${lead.companyId}`}
+                    className="rounded-lg border border-[color:var(--border)] bg-white/5 px-4 py-2 text-sm font-medium text-[color:var(--text)] transition-colors hover:bg-white/10"
+                  >
+                    Invite HVAC Owner
+                  </a>
+                )}
               </div>
             </div>
           ))}
@@ -227,4 +300,13 @@ export default function ProspectsPage() {
       )}
     </div>
   );
+}
+
+function accountStatusLabel(
+  status: Lead["accountStatus"],
+) {
+  if (status === "PRO_CUSTOMER") return "ORBISY Pro customer";
+  if (status === "QUALIFIED") return "Qualified prospect";
+  if (status === "CHURNED") return "Inactive customer";
+  return "Prospect";
 }

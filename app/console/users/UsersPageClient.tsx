@@ -52,6 +52,7 @@ type CompanyOption = {
   name: string;
   city: string | null;
   state: string | null;
+  accountStatus: "PROSPECT" | "QUALIFIED" | "PRO_CUSTOMER" | "CHURNED";
   contacts: Array<{
     id: string;
     fullName: string | null;
@@ -76,7 +77,13 @@ const emptyForm: CreateFormState = {
   customerContactId: "",
 };
 
-export default function UsersPageClient() {
+export default function UsersPageClient({
+  defaultCompanyId = "",
+  defaultRole = "",
+}: {
+  defaultCompanyId?: string;
+  defaultRole?: string;
+}) {
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +98,19 @@ export default function UsersPageClient() {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    if (!defaultCompanyId && !defaultRole) return;
+    setForm((prev) => ({
+      ...prev,
+      role:
+        defaultRole === "HVAC_OWNER" || defaultRole === "HVAC_SALES"
+          ? defaultRole
+          : prev.role,
+      customerCompanyId: defaultCompanyId || prev.customerCompanyId,
+      customerContactId: "",
+    }));
+  }, [defaultCompanyId, defaultRole]);
 
   const selectedCompany = useMemo(
     () => companies.find((company) => company.id === form.customerCompanyId),
@@ -474,7 +494,10 @@ function RoleBadge({ role }: { role: UserRole }) {
 
 function formatCompany(company: CompanyOption) {
   const location = [company.city, company.state].filter(Boolean).join(", ");
-  return location ? `${company.name} - ${location}` : company.name;
+  const status =
+    company.accountStatus === "PRO_CUSTOMER" ? "Pro customer" : "Prospect";
+  const base = location ? `${company.name} - ${location}` : company.name;
+  return `${base} (${status})`;
 }
 
 function formatContact(contact: {

@@ -354,6 +354,13 @@ enum SalesProposalEventType {
   STATUS_CHANGED
 }
 
+enum SalesCompanyAccountStatus {
+  PROSPECT
+  QUALIFIED
+  PRO_CUSTOMER
+  CHURNED
+}
+
 model SalesCompany {
   id                  String             @id @default(cuid())
   slug                String             @unique
@@ -373,6 +380,8 @@ model SalesCompany {
   updatedAt           DateTime           @updatedAt
   isQualified         Boolean            @default(false)
   disqualifiedReason  String?
+  accountStatus       SalesCompanyAccountStatus @default(PROSPECT)
+  convertedToCustomerAt DateTime?
   contacts            SalesContact[]
   audits              SalesWebsiteAudit[]
   scores              SalesLeadScore[]
@@ -385,6 +394,7 @@ model SalesCompany {
   @@index([name])
   @@index([city, state])
   @@index([isQualified])
+  @@index([accountStatus])
   @@index([discoveredAt])
 }
 

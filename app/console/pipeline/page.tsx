@@ -11,6 +11,9 @@ type RankedLead = {
   phone?: string | null;
   city?: string | null;
   state?: string | null;
+  accountStatus: "PROSPECT" | "QUALIFIED" | "PRO_CUSTOMER" | "CHURNED";
+  convertedToCustomerAt: string | null;
+  customerUserCount: number;
   score: number;
   qualified: boolean;
   explanation: string;
@@ -35,6 +38,12 @@ export default function PipelinePage() {
   const [loading, setLoading] = useState(true);
   const [minScore, setMinScore] = useState(70);
   const [creatingDraftFor, setCreatingDraftFor] = useState<string | null>(null);
+  const [convertingCompanyId, setConvertingCompanyId] = useState<string | null>(
+    null,
+  );
+  const [conversionMessage, setConversionMessage] = useState<string | null>(
+    null,
+  );
 
   // Google Places importer state
   const [placesQuery, setPlacesQuery] = useState("");
@@ -81,6 +90,33 @@ export default function PipelinePage() {
       setActiveDraft(data.draft as DraftMessage);
     } finally {
       setCreatingDraftFor(null);
+    }
+  }
+
+  async function convertToCustomer(companyId: string) {
+    setConvertingCompanyId(companyId);
+    setConversionMessage(null);
+
+    try {
+      const res = await fetch(
+        `/api/sales-machine/companies/${companyId}/convert-to-customer`,
+        { method: "POST" },
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to convert company");
+      }
+
+      setConversionMessage(
+        `${data.company.name} is now an active ORBISY Pro customer workspace. Invite an HVAC owner from Users.`,
+      );
+      await fetchRanked();
+    } catch (error) {
+      setConversionMessage(
+        error instanceof Error ? error.message : "Unexpected error",
+      );
+    } finally {
+      setConvertingCompanyId(null);
     }
   }
 
@@ -214,6 +250,11 @@ export default function PipelinePage() {
         </p>
       ) : (
         <div className="space-y-4">
+          {conversionMessage && (
+            <div className="rounded-xl border border-[color:var(--border)] bg-white/5 px-4 py-3 text-sm text-[color:var(--muted)]">
+              {conversionMessage}
+            </div>
+          )}
           {leads.map((lead) => (
             <div
               key={lead.companyId}
@@ -228,6 +269,17 @@ export default function PipelinePage() {
                     {[lead.city, lead.state].filter(Boolean).join(", ") ||
                       "Location not set"}
                   </p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-[color:var(--border)] bg-white/5 px-3 py-1 text-[color:var(--muted)]">
+                      {accountStatusLabel(lead.accountStatus)}
+                    </span>
+                    {lead.customerUserCount > 0 && (
+                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-emerald-300">
+                        {lead.customerUserCount} workspace user
+                        {lead.customerUserCount === 1 ? "" : "s"}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-3 mt-1">
                     {lead.website && (
                       <a
@@ -278,14 +330,34 @@ export default function PipelinePage() {
               </div>
 
               <div className="mt-4">
-                <Button
-                  onClick={() => createDraft(lead.companyId)}
-                  disabled={creatingDraftFor === lead.companyId}
-                >
-                  {creatingDraftFor === lead.companyId
-                    ? "Creating draft..."
-                    : "Create outreach draft"}
-                </Button>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    onClick={() => createDraft(lead.companyId)}
+                    disabled={creatingDraftFor === lead.companyId}
+                  >
+                    {creatingDraftFor === lead.companyId
+                      ? "Creating draft..."
+                      : "Create outreach draft"}
+                  </Button>
+                  {lead.accountStatus !== "PRO_CUSTOMER" ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => convertToCustomer(lead.companyId)}
+                      disabled={convertingCompanyId === lead.companyId}
+                    >
+                      {convertingCompanyId === lead.companyId
+                        ? "Converting..."
+                        : "Convert to Pro Customer"}
+                    </Button>
+                  ) : (
+                    <a
+                      href={`/console/users?role=HVAC_OWNER&companyId=${lead.companyId}`}
+                      className="rounded-lg border border-[color:var(--border)] bg-white/5 px-4 py-2 text-sm font-semibold text-[color:var(--text)] hover:bg-white/10"
+                    >
+                      Invite HVAC Owner
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -375,4 +447,11 @@ export default function PipelinePage() {
       )}
     </div>
   );
+}
+
+function accountStatusLabel(status: RankedLead["accountStatus"]) {
+  if (status === "PRO_CUSTOMER") return "ORBISY Pro customer";
+  if (status === "QUALIFIED") return "Qualified prospect";
+  if (status === "CHURNED") return "Inactive customer";
+  return "Prospect";
 }

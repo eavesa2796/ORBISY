@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import {
+  authErrorToHttp,
+  isHvacRole,
+  requireInternalUser,
+} from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -24,13 +28,15 @@ const EXTRACTED_EVIDENCE_CODES = new Set([
 ]);
 
 export async function GET(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
       return NextResponse.json({ error: auth.message }, { status: auth.status });
     }
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -42,17 +48,29 @@ export async function GET(request: NextRequest) {
     );
     const city = searchParams.get("city") || undefined;
     const state = searchParams.get("state") || undefined;
+    const scopedCompanyId = isHvacRole(session.userRole)
+      ? session.customerCompanyId
+      : null;
+
+    if (isHvacRole(session.userRole) && !scopedCompanyId) {
+      return NextResponse.json({ ok: true, count: 0, leads: [] });
+    }
 
     const scores = await prisma.salesLeadScore.findMany({
       where: {
         totalScore: { gte: minScore },
         company: {
+          ...(scopedCompanyId ? { id: scopedCompanyId } : {}),
           ...(city ? { city: { equals: city, mode: "insensitive" } } : {}),
           ...(state ? { state: { equals: state, mode: "insensitive" } } : {}),
         },
       },
       include: {
-        company: true,
+        company: {
+          include: {
+            customerUsers: { select: { id: true } },
+          },
+        },
         evidence: true,
       },
       orderBy: [{ totalScore: "desc" }, { createdAt: "desc" }],
@@ -69,6 +87,53 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    if (scopedCompanyId && ranked.length === 0) {
+      const company = await prisma.salesCompany.findUnique({
+        where: { id: scopedCompanyId },
+        include: {
+          customerUsers: { select: { id: true } },
+        },
+      });
+
+      if (!company) {
+        return NextResponse.json({ ok: true, count: 0, leads: [] });
+      }
+
+      return NextResponse.json({
+        ok: true,
+        count: 1,
+        leads: [
+          {
+            companyId: company.id,
+            companyName: company.name,
+            slug: company.slug,
+            website: company.website,
+            phone: company.phone,
+            city: company.city,
+            state: company.state,
+            accountStatus: company.accountStatus,
+            convertedToCustomerAt: company.convertedToCustomerAt,
+            customerUserCount: company.customerUsers.length,
+            score: 0,
+            buyingLikelihood: 0,
+            qualified: company.isQualified,
+            explanation:
+              "Workspace company is linked, but no lead score has been generated yet.",
+            dealThesis: undefined,
+            thesisConfidence: 0,
+            scoreBreakdown: {
+              icpFit: 0,
+              revenuePotential: 0,
+              painSignals: 0,
+              contactability: 0,
+              disqualifiers: 0,
+            },
+            topEvidence: [],
+          },
+        ],
+      });
+    }
+
     return NextResponse.json({
       ok: true,
       count: ranked.length,
@@ -80,6 +145,9 @@ export async function GET(request: NextRequest) {
         phone: row.company.phone,
         city: row.company.city,
         state: row.company.state,
+        accountStatus: row.company.accountStatus,
+        convertedToCustomerAt: row.company.convertedToCustomerAt,
+        customerUserCount: row.company.customerUsers?.length ?? 0,
         score: row.totalScore,
         buyingLikelihood: row.buyingLikelihood,
         qualified: row.company.isQualified,

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import {
+  authErrorToHttp,
+  isHvacRole,
+  requireInternalUser,
+} from "@/lib/session";
 import {
   getProposalFollowUpDays,
   serializeInternalProposal,
@@ -68,8 +72,9 @@ function getWarrantyDefaultForTier(
 }
 
 export async function GET(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
@@ -78,6 +83,10 @@ export async function GET(request: NextRequest) {
         { status: auth.status },
       );
     }
+    return NextResponse.json(
+      { ok: false, error: "Unauthorized" },
+      { status: 401 },
+    );
   }
 
   try {
@@ -107,6 +116,9 @@ export async function GET(request: NextRequest) {
     const proposals = await prisma.salesProposal.findMany({
       where: {
         status: { in: statuses },
+        ...(isHvacRole(session.userRole)
+          ? { companyId: session.customerCompanyId || "__unlinked_hvac_workspace__" }
+          : {}),
         ...(opportunityId ? { opportunityId } : {}),
       },
       include: {
@@ -160,8 +172,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   let sessionUserId: string;
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    const session = await requireInternalUser();
+    session = await requireInternalUser();
     sessionUserId = session.userId;
   } catch (error) {
     const auth = authErrorToHttp(error);
@@ -222,6 +235,22 @@ export async function POST(request: NextRequest) {
         { ok: false, error: "Opportunity not found" },
         { status: 404 },
       );
+    }
+
+    if (isHvacRole(session.userRole)) {
+      if (!session.customerCompanyId) {
+        return NextResponse.json(
+          { ok: false, error: "HVAC user is not linked to a company workspace" },
+          { status: 403 },
+        );
+      }
+
+      if (opportunity.companyId !== session.customerCompanyId) {
+        return NextResponse.json(
+          { ok: false, error: "Cannot create proposals for another company" },
+          { status: 403 },
+        );
+      }
     }
 
     const equipmentIds = Array.from(
