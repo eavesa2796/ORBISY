@@ -38,16 +38,19 @@ export default function ProClientLayout({
         </div>
 
         <nav className="mt-8 px-4 space-y-2">
-          <NavLink href="/pro" icon="🏠">
+          <NavLink href="/pro" icon="PD">
             Pro Dashboard
           </NavLink>
-          <NavLink href="/pro/proposals" icon="🧾">
+          <NavLink href="/pro/catalog" icon="CA">
+            Catalog
+          </NavLink>
+          <NavLink href="/pro/proposals" icon="QP">
             Proposals
           </NavLink>
-          <NavLink href="/pro/proposals/settings" icon="⚙️">
+          <NavLink href="/pro/proposals/settings" icon="PS">
             Proposal Settings
           </NavLink>
-          <NavLink href="/portal" icon="👤">
+          <NavLink href="/portal" icon="CP">
             Customer Portal
           </NavLink>
         </nav>
@@ -57,7 +60,7 @@ export default function ProClientLayout({
             onClick={handleLogout}
             className="w-full flex items-center justify-center px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition-colors text-red-400 font-medium"
           >
-            <span className="mr-2">🚪</span>
+            <span className="mr-2">Exit</span>
             Logout
           </button>
         </div>
@@ -84,7 +87,9 @@ function NavLink({
       href={href}
       className="flex items-center px-4 py-3 rounded-xl hover:bg-white/5 transition-colors text-[color:var(--text)] hover:text-[color:var(--accent)]"
     >
-      <span className="mr-3">{icon}</span>
+      <span className="mr-3 text-xs font-semibold tracking-wide text-[color:var(--muted)]">
+        {icon}
+      </span>
       <span>{children}</span>
     </Link>
   );

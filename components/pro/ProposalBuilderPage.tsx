@@ -843,7 +843,17 @@ export default function ProposalsPage() {
         </div>
 
         <div className="rounded-lg border border-[color:var(--border)] bg-white/5 p-3 space-y-3">
-          <p className="text-sm font-semibold text-[color:var(--text)]">Catalog filters</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-[color:var(--text)]">
+              Catalog filters
+            </p>
+            <Link
+              href="/pro/catalog"
+              className="text-sm font-semibold text-[color:var(--accent)] hover:opacity-90"
+            >
+              Manage Catalog
+            </Link>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <input
               value={catalogSearch}

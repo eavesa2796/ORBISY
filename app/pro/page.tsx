@@ -12,7 +12,22 @@ export default function ProDashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Link
+          href="/pro/catalog"
+          className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-6 transition hover:bg-white/5"
+        >
+          <p className="text-sm font-semibold uppercase tracking-wide text-[color:var(--muted)]">
+            Pricebook
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-[color:var(--text)]">
+            Catalog
+          </h2>
+          <p className="mt-2 text-sm text-[color:var(--muted)]">
+            Manage equipment costs, pricing rules, model specs, and CSV imports.
+          </p>
+        </Link>
+
         <Link
           href="/pro/proposals"
           className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-6 transition hover:bg-white/5"
