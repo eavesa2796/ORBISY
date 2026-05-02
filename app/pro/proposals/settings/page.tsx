@@ -1,5 +1,5 @@
-import ProposalSettingsPage from "@/components/pro/ProposalSettingsPage";
+import { redirect } from "next/navigation";
 
 export default function ProProposalSettingsPage() {
-  return <ProposalSettingsPage />;
+  redirect("/pro/settings");
 }

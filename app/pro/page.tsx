@@ -52,10 +52,10 @@ export default async function ProDashboardPage() {
             Open Proposal Builder
           </Link>
           <Link
-            href="/pro/proposals/settings"
+            href="/pro/settings"
             className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-6 transition hover:bg-white/5"
           >
-            Open Pricing Settings
+            Open Workspace Settings
           </Link>
         </div>
       </div>

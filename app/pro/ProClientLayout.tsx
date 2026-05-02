@@ -50,8 +50,8 @@ export default function ProClientLayout({
           <NavLink href="/pro/proposals" icon="QP">
             Proposals
           </NavLink>
-          <NavLink href="/pro/proposals/settings" icon="PS">
-            Proposal Settings
+          <NavLink href="/pro/settings" icon="ST">
+            Settings
           </NavLink>
           <NavLink href="/portal" icon="CP">
             Customer Portal

@@ -282,7 +282,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const settings = await getProposalPricingSettings();
+    const settings = await getProposalPricingSettings(opportunity.companyId);
 
     const optionsWithPricing = body.options.map((option, index) => {
       const item = option.equipmentItemId

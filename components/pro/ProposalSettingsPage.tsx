@@ -22,6 +22,13 @@ type FormState = {
 
 type ValidationErrors = Partial<Record<keyof FormState, string>>;
 
+type ProposalSettingsPageProps = {
+  heading?: string;
+  description?: string;
+  showBreadcrumb?: boolean;
+  maxWidthClass?: string;
+};
+
 function settingsToForm(settings: ProposalPricingSettings): FormState {
   return {
     defaultLaborCost: String(settings.defaultLaborCost),
@@ -93,7 +100,12 @@ export function validateProposalSettingsForm(
   return errors;
 }
 
-export default function ProposalSettingsPage() {
+export default function ProposalSettingsPage({
+  heading = "Proposal Settings",
+  description = "Default values applied when creating new proposal options. Each field can still be overridden per-proposal.",
+  showBreadcrumb = true,
+  maxWidthClass = "max-w-3xl",
+}: ProposalSettingsPageProps = {}) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -218,25 +230,26 @@ export default function ProposalSettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className={`space-y-6 ${maxWidthClass}`}>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm text-[color:var(--muted)]">
-            <Link
-              href="/pro/proposals"
-              className="hover:underline text-[color:var(--muted)]"
-            >
-              Proposals
-            </Link>
-            {" / "}
-            <span>Settings</span>
-          </p>
+          {showBreadcrumb && (
+            <p className="text-sm text-[color:var(--muted)]">
+              <Link
+                href="/pro/proposals"
+                className="hover:underline text-[color:var(--muted)]"
+              >
+                Proposals
+              </Link>
+              {" / "}
+              <span>Settings</span>
+            </p>
+          )}
           <h1 className="mt-1 text-3xl font-bold text-[color:var(--text)]">
-            Proposal Settings
+            {heading}
           </h1>
           <p className="mt-2 text-[color:var(--muted)]">
-            Default values applied when creating new proposal options. Each
-            field can still be overridden per-proposal.
+            {description}
           </p>
         </div>
       </div>

@@ -746,10 +746,10 @@ export default function ProposalsPage() {
           </p>
         </div>
         <Link
-          href="/pro/proposals/settings"
+          href="/pro/settings"
           className="shrink-0 rounded-lg border border-[color:var(--border)] px-4 py-2 text-sm font-semibold text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors"
         >
-          ⚙️ Proposal Settings
+          Proposal Settings
         </Link>
       </div>
 

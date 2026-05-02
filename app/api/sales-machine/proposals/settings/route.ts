@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
-import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import {
+  AuthError,
+  authErrorToHttp,
+  isHvacRole,
+  requireInternalUser,
+  type ValidatedSession,
+} from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import {
   DEFAULT_PROPOSAL_PRICING_SETTINGS,
+  getProposalSettingsId,
   getProposalPricingSettings,
   normalizeProposalPricingSettings,
   type ProposalPricingSettings,
@@ -12,9 +19,22 @@ export const runtime = "nodejs";
 
 type SettingsPatchPayload = Partial<ProposalPricingSettings>;
 
+function resolveSettingsCompanyId(session: ValidatedSession) {
+  if (!isHvacRole(session.userRole)) {
+    return null;
+  }
+
+  if (!session.customerCompanyId) {
+    throw new AuthError("HVAC user is not linked to a company workspace", 403);
+  }
+
+  return session.customerCompanyId;
+}
+
 export async function GET() {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
@@ -23,12 +43,26 @@ export async function GET() {
         { status: auth.status },
       );
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const settings = await getProposalPricingSettings();
-    return NextResponse.json({ ok: true, settings });
+    const companyId = resolveSettingsCompanyId(session);
+    const settings = await getProposalPricingSettings(companyId);
+    return NextResponse.json({
+      ok: true,
+      scope: companyId ? "company" : "global",
+      companyId,
+      settings,
+    });
   } catch (error) {
+    const auth = authErrorToHttp(error);
+    if (auth) {
+      return NextResponse.json(
+        { ok: false, error: auth.message },
+        { status: auth.status },
+      );
+    }
     return NextResponse.json(
       {
         ok: false,
@@ -40,8 +74,9 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
@@ -50,17 +85,21 @@ export async function PUT(request: Request) {
         { status: auth.status },
       );
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    const companyId = resolveSettingsCompanyId(session);
     const payload = (await request.json()) as SettingsPatchPayload;
-    const current = await getProposalPricingSettings();
+    const current = await getProposalPricingSettings(companyId);
     const next = normalizeProposalPricingSettings(payload, current);
+    const settingsId = getProposalSettingsId(companyId);
 
     const saved = await prisma.salesProposalSettings.upsert({
-      where: { id: "default" },
+      where: { id: settingsId },
       create: {
-        id: "default",
+        id: settingsId,
+        companyId,
         defaultLaborCost: next.defaultLaborCost,
         defaultFinancingApr: next.defaultFinancingApr,
         defaultFinancingMonths: next.defaultFinancingMonths,
@@ -88,6 +127,8 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({
       ok: true,
+      scope: companyId ? "company" : "global",
+      companyId,
       settings: normalizeProposalPricingSettings(
         {
           defaultLaborCost: Number(saved.defaultLaborCost),
@@ -105,6 +146,13 @@ export async function PUT(request: Request) {
       ),
     });
   } catch (error) {
+    const auth = authErrorToHttp(error);
+    if (auth) {
+      return NextResponse.json(
+        { ok: false, error: auth.message },
+        { status: auth.status },
+      );
+    }
     return NextResponse.json(
       {
         ok: false,

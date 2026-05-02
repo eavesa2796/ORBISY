@@ -9,15 +9,19 @@ import {
   normalizeProposalPricingSettings,
   type ProposalPricingSettings,
 } from "./settings-shared";
-export async function getProposalPricingSettings(): Promise<ProposalPricingSettings> {
-  const row = await prisma.salesProposalSettings.findUnique({
-    where: { id: "default" },
-  });
 
-  if (!row) {
-    return DEFAULT_PROPOSAL_PRICING_SETTINGS;
-  }
-
+function serializeProposalSettingsRow(row: {
+  defaultLaborCost: { toString(): string } | number;
+  defaultFinancingApr: number;
+  defaultFinancingMonths: number;
+  defaultWarrantyGood: string;
+  defaultWarrantyBetter: string;
+  defaultWarrantyBest: string;
+  permitFeeDefault: { toString(): string } | number;
+  taxRatePercent: number;
+  companyProposalFooter: string;
+  proposalDisclaimer: string;
+}) {
   return normalizeProposalPricingSettings({
     defaultLaborCost: Number(row.defaultLaborCost),
     defaultFinancingApr: row.defaultFinancingApr,
@@ -30,4 +34,32 @@ export async function getProposalPricingSettings(): Promise<ProposalPricingSetti
     companyProposalFooter: row.companyProposalFooter,
     proposalDisclaimer: row.proposalDisclaimer,
   });
+}
+
+export function getProposalSettingsId(companyId?: string | null) {
+  return companyId ? `company:${companyId}` : "default";
+}
+
+export async function getProposalPricingSettings(
+  companyId?: string | null,
+): Promise<ProposalPricingSettings> {
+  if (companyId) {
+    const companyRow = await prisma.salesProposalSettings.findUnique({
+      where: { companyId },
+    });
+
+    if (companyRow) {
+      return serializeProposalSettingsRow(companyRow);
+    }
+  }
+
+  const row = await prisma.salesProposalSettings.findUnique({
+    where: { id: "default" },
+  });
+
+  if (!row) {
+    return DEFAULT_PROPOSAL_PRICING_SETTINGS;
+  }
+
+  return serializeProposalSettingsRow(row);
 }

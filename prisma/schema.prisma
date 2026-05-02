@@ -386,6 +386,8 @@ model SalesCompany {
   city                String?
   state               String?
   country             String             @default("US")
+  logoUrl             String?
+  brandColor          String?
   placeId             String?            @unique
   category            String?
   rating              Float?
@@ -407,6 +409,7 @@ model SalesCompany {
   proposals           SalesProposal[]
   catalogItems        SalesHvacCatalogItem[]
   catalogImportJobs   SalesCatalogImportJob[]
+  proposalSettings    SalesProposalSettings?
 
   @@index([slug])
   @@index([name])
@@ -771,6 +774,7 @@ model SalesProposalEvent {
 
 model SalesProposalSettings {
   id                    String   @id @default("default")
+  companyId             String?  @unique
   defaultLaborCost      Decimal  @db.Decimal(12, 2)
   defaultFinancingApr   Float
   defaultFinancingMonths Int
@@ -783,4 +787,7 @@ model SalesProposalSettings {
   proposalDisclaimer    String   @db.Text
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+  company               SalesCompany? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
 }

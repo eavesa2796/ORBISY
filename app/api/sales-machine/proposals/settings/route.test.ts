@@ -15,6 +15,15 @@ const {
 vi.mock("@/lib/session", () => ({
   requireInternalUser: requireInternalUserMock,
   authErrorToHttp: authErrorToHttpMock,
+  isHvacRole: (role: string) => role === "HVAC_OWNER" || role === "HVAC_SALES",
+  AuthError: class AuthError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+      super(message);
+      this.status = status;
+    }
+  },
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -116,6 +125,66 @@ describe("PUT /api/sales-machine/proposals/settings", () => {
     expect(body.settings.permitFeeDefault).toBe(150);
     expect(body.settings.taxRatePercent).toBe(6.5);
     expect(settingsUpsertMock).toHaveBeenCalledOnce();
+    expect(settingsUpsertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "default" },
+        create: expect.objectContaining({ id: "default", companyId: null }),
+      }),
+    );
+  });
+
+  it("saves company-scoped settings for HVAC users", async () => {
+    requireInternalUserMock.mockResolvedValue({
+      userId: "user_1",
+      userRole: "HVAC_OWNER",
+      customerCompanyId: "company_1",
+    });
+    settingsFindUniqueMock.mockResolvedValue(null);
+    settingsUpsertMock.mockResolvedValue({
+      id: "company:company_1",
+      companyId: "company_1",
+      defaultLaborCost: "2100",
+      defaultFinancingApr: 8.25,
+      defaultFinancingMonths: 120,
+      defaultWarrantyGood: "10-year parts",
+      defaultWarrantyBetter: "10-year parts + 2-year labor",
+      defaultWarrantyBest: "10-year parts + 10-year labor",
+      permitFeeDefault: "125",
+      taxRatePercent: 7,
+      companyProposalFooter: "Thanks.",
+      proposalDisclaimer: "Valid 14 days.",
+    });
+
+    const request = new Request(
+      "http://localhost/api/sales-machine/proposals/settings",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          defaultLaborCost: 2100,
+          permitFeeDefault: 125,
+          taxRatePercent: 7,
+          companyProposalFooter: "Thanks.",
+          proposalDisclaimer: "Valid 14 days.",
+        }),
+      },
+    );
+
+    const response = await PUT(request);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.scope).toBe("company");
+    expect(body.companyId).toBe("company_1");
+    expect(settingsUpsertMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "company:company_1" },
+        create: expect.objectContaining({
+          id: "company:company_1",
+          companyId: "company_1",
+        }),
+      }),
+    );
   });
 
   it("returns 401 when user is not authenticated", async () => {
