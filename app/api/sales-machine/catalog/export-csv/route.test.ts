@@ -12,6 +12,15 @@ const { requireInternalUserMock, authErrorToHttpMock, findManyMock } =
 vi.mock("@/lib/session", () => ({
   requireInternalUser: requireInternalUserMock,
   authErrorToHttp: authErrorToHttpMock,
+  isHvacRole: (role: string) => role === "HVAC_OWNER" || role === "HVAC_SALES",
+  AuthError: class AuthError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+      super(message);
+      this.status = status;
+    }
+  },
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -30,6 +39,7 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
     requireInternalUserMock.mockResolvedValue({
       userId: "user_1",
       userRole: "HVAC_SALES",
+      customerCompanyId: "company_1",
     });
     authErrorToHttpMock.mockReturnValue(null);
   });
@@ -80,7 +90,9 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
     expect(response.headers.get("content-type")).toContain("text/csv");
     expect(header).toBe(CATALOG_CSV_COLUMNS.join(","));
     expect(findManyMock).toHaveBeenCalledWith({
-      where: undefined,
+      where: {
+        OR: [{ companyId: "company_1" }, { companyId: null }],
+      },
       orderBy: [{ equipmentType: "asc" }, { brand: "asc" }, { modelNumber: "asc" }],
     });
     expect(firstRow.endsWith(",true")).toBe(true);
@@ -116,7 +128,12 @@ describe("GET /api/sales-machine/catalog/export-csv", () => {
 
     expect(response.status).toBe(200);
     expect(findManyMock).toHaveBeenCalledWith({
-      where: { isActive: true },
+      where: {
+        AND: [
+          { OR: [{ companyId: "company_1" }, { companyId: null }] },
+          { isActive: true },
+        ],
+      },
       orderBy: [{ equipmentType: "asc" }, { brand: "asc" }, { modelNumber: "asc" }],
     });
     expect(onlyRow.endsWith(",true")).toBe(true);

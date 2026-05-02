@@ -1,24 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import { getCatalogVisibilityWhere } from "@/lib/sales/catalog/access";
 import { exportCatalogCsv } from "@/lib/sales/catalog/csv";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
       return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status });
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const activeOnly = new URL(request.url).searchParams.get("activeOnly") === "true";
+    const where = getCatalogVisibilityWhere(
+      session,
+      activeOnly ? { isActive: true } : undefined,
+    );
     const items = await prisma.salesHvacCatalogItem.findMany({
-      where: activeOnly ? { isActive: true } : undefined,
+      where,
       orderBy: [{ equipmentType: "asc" }, { brand: "asc" }, { modelNumber: "asc" }],
     });
 

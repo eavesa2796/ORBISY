@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import {
+  getCatalogMutableWhere,
+  serializeCatalogItem,
+} from "@/lib/sales/catalog/access";
 
 export const runtime = "nodejs";
 
@@ -33,22 +37,35 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
       return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status });
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
 
   try {
     const body = (await request.json()) as UpdateCatalogPayload;
+    const existing = await prisma.salesHvacCatalogItem.findFirst({
+      where: getCatalogMutableWhere(session, id),
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json(
+        { ok: false, error: "Catalog item not found" },
+        { status: 404 },
+      );
+    }
 
     const updated = await prisma.salesHvacCatalogItem.update({
-      where: { id },
+      where: { id: existing.id },
       data: {
         ...(body.equipmentType !== undefined ? { equipmentType: body.equipmentType } : {}),
         ...(body.brand !== undefined ? { brand: body.brand.trim() } : {}),
@@ -68,22 +85,7 @@ export async function PATCH(
 
     return NextResponse.json({
       ok: true,
-      item: {
-        id: updated.id,
-        equipmentType: updated.equipmentType,
-        brand: updated.brand,
-        modelNumber: updated.modelNumber,
-        sizeTonnage: updated.sizeTonnage,
-        efficiencyRating: updated.efficiencyRating,
-        cost: Number(updated.cost),
-        pricingMode: updated.pricingMode,
-        sellPrice: updated.sellPrice ? Number(updated.sellPrice) : null,
-        marginPercent: updated.marginPercent,
-        description: updated.description,
-        imageUrl: updated.imageUrl,
-        brochureUrl: updated.brochureUrl,
-        isActive: updated.isActive,
-      },
+      item: serializeCatalogItem(updated),
     });
   } catch (error) {
     return NextResponse.json(

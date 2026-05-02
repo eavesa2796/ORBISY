@@ -10,6 +10,7 @@ import {
   getProposalFollowUpDays,
   serializeInternalProposal,
 } from "@/lib/sales/proposals/internal-list";
+import { getCatalogVisibilityWhere } from "@/lib/sales/catalog/access";
 import {
   calculateProposalOptionPricing,
   type AddonType,
@@ -261,7 +262,10 @@ export async function POST(request: NextRequest) {
 
     const catalogItems = equipmentIds.length
       ? await prisma.salesHvacCatalogItem.findMany({
-          where: { id: { in: equipmentIds }, isActive: true },
+          where: getCatalogVisibilityWhere(session, {
+            id: { in: equipmentIds },
+            isActive: true,
+          }),
         })
       : [];
 
@@ -331,15 +335,29 @@ export async function POST(request: NextRequest) {
       const equipmentSnapshot =
         option.equipmentSnapshot ||
         (item
-          ? {
-              equipmentType: item.equipmentType,
-              brand: item.brand,
-              modelNumber: item.modelNumber,
-              sizeTonnage: item.sizeTonnage,
-              efficiencyRating: item.efficiencyRating,
-              description: item.description,
-            }
-          : undefined);
+        ? {
+            equipmentType: item.equipmentType,
+            brand: item.brand,
+            modelNumber: item.modelNumber,
+            sizeTonnage: item.sizeTonnage,
+            efficiencyRating: item.efficiencyRating,
+            description: item.description,
+            energyStarCertified: item.energyStarCertified,
+            ahriReferenceNumber: item.ahriReferenceNumber,
+            productType: item.productType,
+            coldClimate: item.coldClimate,
+            taxCreditEligible: item.taxCreditEligible,
+            seer2: item.seer2,
+            eer2: item.eer2,
+            hspf2: item.hspf2,
+            coolingCapacityBtu: item.coolingCapacityBtu,
+            heatingCapacityBtu47: item.heatingCapacityBtu47,
+            heatingCapacityBtu17: item.heatingCapacityBtu17,
+            heatingCapacityBtu5: item.heatingCapacityBtu5,
+            copAt5: item.copAt5,
+            refrigerantType: item.refrigerantType,
+          }
+        : undefined);
 
       return {
         proposalId: "",

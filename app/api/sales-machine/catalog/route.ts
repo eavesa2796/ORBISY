@@ -1,49 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authErrorToHttp, requireInternalUser } from "@/lib/session";
+import {
+  getCatalogVisibilityWhere,
+  getCatalogWriteCompanyId,
+  serializeCatalogItem,
+} from "@/lib/sales/catalog/access";
 
 export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
       return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status });
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     const { searchParams } = new URL(request.url);
     const activeOnly = searchParams.get("activeOnly") !== "false";
     const limit = Math.min(parseInt(searchParams.get("limit") || "200", 10), 500);
+    const where = getCatalogVisibilityWhere(
+      session,
+      activeOnly ? { isActive: true } : undefined,
+    );
 
     const items = await prisma.salesHvacCatalogItem.findMany({
-      where: activeOnly ? { isActive: true } : undefined,
-      orderBy: [{ updatedAt: "desc" }],
+      where,
+      orderBy: [{ companyId: "desc" }, { updatedAt: "desc" }],
       take: limit,
     });
 
     return NextResponse.json({
       ok: true,
       count: items.length,
-      items: items.map((item) => ({
-        id: item.id,
-        equipmentType: item.equipmentType,
-        brand: item.brand,
-        modelNumber: item.modelNumber,
-        sizeTonnage: item.sizeTonnage,
-        efficiencyRating: item.efficiencyRating,
-        cost: Number(item.cost),
-        pricingMode: item.pricingMode,
-        sellPrice: item.sellPrice ? Number(item.sellPrice) : null,
-        marginPercent: item.marginPercent,
-        description: item.description,
-        imageUrl: item.imageUrl,
-        brochureUrl: item.brochureUrl,
-        isActive: item.isActive,
-      })),
+      items: items.map(serializeCatalogItem),
     });
   } catch (error) {
     return NextResponse.json(
@@ -76,16 +72,19 @@ type CreateCatalogPayload = {
   imageUrl?: string;
   brochureUrl?: string;
   isActive?: boolean;
+  companyId?: string | null;
 };
 
 export async function POST(request: NextRequest) {
+  let session: Awaited<ReturnType<typeof requireInternalUser>>;
   try {
-    await requireInternalUser();
+    session = await requireInternalUser();
   } catch (error) {
     const auth = authErrorToHttp(error);
     if (auth) {
       return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status });
     }
+    return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   try {
@@ -102,6 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     const pricingMode = body.pricingMode || "COST_PLUS_MARGIN";
+    const companyId = getCatalogWriteCompanyId(session, body.companyId);
 
     if (pricingMode === "FIXED_SELL_PRICE" && (body.sellPrice === undefined || body.sellPrice < 0)) {
       return NextResponse.json(
@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
 
     const created = await prisma.salesHvacCatalogItem.create({
       data: {
+        companyId,
         equipmentType: body.equipmentType,
         brand: body.brand.trim(),
         modelNumber: body.modelNumber.trim(),
@@ -124,28 +125,14 @@ export async function POST(request: NextRequest) {
         description: body.description?.trim() || undefined,
         imageUrl: body.imageUrl?.trim() || undefined,
         brochureUrl: body.brochureUrl?.trim() || undefined,
+        sourceProvider: "MANUAL",
         isActive: body.isActive ?? true,
       },
     });
 
     return NextResponse.json({
       ok: true,
-      item: {
-        id: created.id,
-        equipmentType: created.equipmentType,
-        brand: created.brand,
-        modelNumber: created.modelNumber,
-        sizeTonnage: created.sizeTonnage,
-        efficiencyRating: created.efficiencyRating,
-        cost: Number(created.cost),
-        pricingMode: created.pricingMode,
-        sellPrice: created.sellPrice ? Number(created.sellPrice) : null,
-        marginPercent: created.marginPercent,
-        description: created.description,
-        imageUrl: created.imageUrl,
-        brochureUrl: created.brochureUrl,
-        isActive: created.isActive,
-      },
+      item: serializeCatalogItem(created),
     });
   } catch (error) {
     return NextResponse.json(

@@ -322,6 +322,22 @@ enum SalesCatalogPricingMode {
   COST_PLUS_MARGIN
 }
 
+enum SalesCatalogSourceProvider {
+  MANUAL
+  CSV
+  ENERGY_STAR
+  NEEP
+  AHRI
+  SUPPLIER
+  MANUFACTURER
+}
+
+enum SalesCatalogImportStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
 enum SalesProposalStatus {
   DRAFT
   SENT
@@ -389,6 +405,8 @@ model SalesCompany {
   customerUsers       User[]              @relation("CustomerCompanyUsers")
   opportunities       SalesOpportunity[]
   proposals           SalesProposal[]
+  catalogItems        SalesHvacCatalogItem[]
+  catalogImportJobs   SalesCatalogImportJob[]
 
   @@index([slug])
   @@index([name])
@@ -582,6 +600,7 @@ model SalesOpportunity {
 
 model SalesHvacCatalogItem {
   id                String                  @id @default(cuid())
+  companyId         String?
   equipmentType     SalesEquipmentType
   brand             String
   modelNumber       String
@@ -594,15 +613,58 @@ model SalesHvacCatalogItem {
   description       String?                 @db.Text
   imageUrl          String?
   brochureUrl       String?
+  sourceProvider    SalesCatalogSourceProvider @default(MANUAL)
+  sourceProductId   String?
+  sourceDatasetId   String?
+  sourceSyncedAt    DateTime?
+  sourceMetadata    Json?
+  energyStarCertified Boolean              @default(false)
+  ahriReferenceNumber String?
+  productType       String?
+  coldClimate       Boolean?
+  taxCreditEligible Boolean?
+  seer2             Float?
+  eer2              Float?
+  hspf2             Float?
+  afue              Float?
+  coolingCapacityBtu Int?
+  heatingCapacityBtu47 Int?
+  heatingCapacityBtu17 Int?
+  heatingCapacityBtu5 Int?
+  copAt5            Float?
+  refrigerantType   String?
   isActive          Boolean                 @default(true)
   createdAt         DateTime                @default(now())
   updatedAt         DateTime                @updatedAt
+  company           SalesCompany?           @relation(fields: [companyId], references: [id], onDelete: Cascade)
   proposalOptions   SalesProposalOption[]
 
+  @@index([companyId])
   @@index([equipmentType])
   @@index([brand])
+  @@index([brand, modelNumber])
   @@index([isActive])
-  @@unique([brand, modelNumber])
+  @@index([sourceProvider])
+  @@index([sourceProvider, sourceProductId])
+}
+
+model SalesCatalogImportJob {
+  id              String                   @id @default(cuid())
+  companyId       String?
+  sourceProvider  SalesCatalogSourceProvider
+  status          SalesCatalogImportStatus @default(COMPLETED)
+  searchQuery     String?
+  importedCount   Int                      @default(0)
+  skippedCount    Int                      @default(0)
+  errorCount      Int                      @default(0)
+  metadata        Json?
+  createdAt       DateTime                 @default(now())
+  completedAt     DateTime?
+  company         SalesCompany?            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([sourceProvider])
+  @@index([createdAt])
 }
 
 model SalesProposal {

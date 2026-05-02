@@ -15,9 +15,18 @@ type EquipmentType =
   | "OTHER";
 
 type PricingMode = "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
+type SourceProvider =
+  | "MANUAL"
+  | "CSV"
+  | "ENERGY_STAR"
+  | "NEEP"
+  | "AHRI"
+  | "SUPPLIER"
+  | "MANUFACTURER";
 
 type CatalogItem = {
   id: string;
+  companyId: string | null;
   equipmentType: EquipmentType;
   brand: string;
   modelNumber: string;
@@ -30,7 +39,45 @@ type CatalogItem = {
   description: string | null;
   imageUrl: string | null;
   brochureUrl: string | null;
+  sourceProvider: SourceProvider;
+  sourceProductId: string | null;
+  energyStarCertified: boolean;
+  ahriReferenceNumber: string | null;
+  productType: string | null;
+  coldClimate: boolean | null;
+  taxCreditEligible: boolean | null;
+  seer2: number | null;
+  eer2: number | null;
+  hspf2: number | null;
+  coolingCapacityBtu: number | null;
+  heatingCapacityBtu47: number | null;
+  heatingCapacityBtu17: number | null;
+  heatingCapacityBtu5: number | null;
+  copAt5: number | null;
+  refrigerantType: string | null;
   isActive: boolean;
+};
+
+type EnergyStarResult = {
+  sourceProductId: string;
+  brand: string;
+  modelNumber: string;
+  productType: string | null;
+  seriesName: string | null;
+  sizeTonnage: string | null;
+  efficiencyRating: string | null;
+  ahriReferenceNumber: string | null;
+  coldClimate: boolean | null;
+  taxCreditEligible: boolean | null;
+  seer2: number | null;
+  eer2: number | null;
+  hspf2: number | null;
+  coolingCapacityBtu: number | null;
+  heatingCapacityBtu47: number | null;
+  heatingCapacityBtu17: number | null;
+  heatingCapacityBtu5: number | null;
+  copAt5: number | null;
+  refrigerantType: string | null;
 };
 
 type CatalogForm = {
@@ -103,6 +150,12 @@ export default function CatalogPage() {
   const [importing, setImporting] = useState(false);
   const [importSummary, setImportSummary] = useState<CatalogImportSummary | null>(null);
   const [importErrors, setImportErrors] = useState<CatalogImportRowError[]>([]);
+  const [energyStarQuery, setEnergyStarQuery] = useState("");
+  const [energyStarCost, setEnergyStarCost] = useState("0");
+  const [energyStarMargin, setEnergyStarMargin] = useState("35");
+  const [energyStarSearching, setEnergyStarSearching] = useState(false);
+  const [energyStarResults, setEnergyStarResults] = useState<EnergyStarResult[]>([]);
+  const [energyStarImportingId, setEnergyStarImportingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadCatalog();
@@ -122,6 +175,9 @@ export default function CatalogPage() {
         item.sizeTonnage,
         item.efficiencyRating,
         item.description,
+        item.ahriReferenceNumber,
+        item.productType,
+        item.sourceProvider,
       ]
         .filter(Boolean)
         .join(" ")
@@ -291,6 +347,75 @@ export default function CatalogPage() {
       });
     } finally {
       setImporting(false);
+    }
+  }
+
+  async function searchEnergyStar(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const query = energyStarQuery.trim();
+    if (query.length < 2) {
+      setMessage({ type: "error", text: "Enter at least 2 characters to search ENERGY STAR." });
+      return;
+    }
+
+    setEnergyStarSearching(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch(
+        `/api/sales-machine/catalog/energy-star/search?query=${encodeURIComponent(query)}&limit=12`,
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "ENERGY STAR search failed");
+      setEnergyStarResults(data.results || []);
+      if ((data.results || []).length === 0) {
+        setMessage({ type: "success", text: "No ENERGY STAR matches found." });
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Unexpected error",
+      });
+    } finally {
+      setEnergyStarSearching(false);
+    }
+  }
+
+  async function importEnergyStarResult(result: EnergyStarResult) {
+    setEnergyStarImportingId(result.sourceProductId);
+    setMessage(null);
+
+    try {
+      const cost = parseRequiredMoney(energyStarCost || "0", "Default cost");
+      const marginPercent = parseOptionalMoney(energyStarMargin, "Margin percent");
+      const res = await fetch("/api/sales-machine/catalog/energy-star/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sourceProductId: result.sourceProductId,
+          cost,
+          pricingMode: "COST_PLUS_MARGIN",
+          marginPercent,
+          isActive: true,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "ENERGY STAR import failed");
+
+      await loadCatalog();
+      setMessage({
+        type: "success",
+        text: data.created
+          ? "ENERGY STAR item imported."
+          : "ENERGY STAR item refreshed without replacing pricing overrides.",
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Unexpected error",
+      });
+    } finally {
+      setEnergyStarImportingId(null);
     }
   }
 
@@ -507,6 +632,129 @@ export default function CatalogPage() {
       </section>
 
       <section className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-[color:var(--text)]">
+              ENERGY STAR Heat Pump Import
+            </h2>
+            <p className="mt-1 text-sm text-[color:var(--muted)]">
+              Search certified heat pump models, import the specs, then keep your own cost and margin.
+            </p>
+          </div>
+          <a
+            href="https://www.energystar.gov/productfinder/product/certified-central-heat-pumps/"
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-lg border border-[color:var(--border)] px-3 py-2 text-sm font-semibold text-[color:var(--text)] hover:bg-white/5"
+          >
+            Open Product Finder
+          </a>
+        </div>
+
+        <form onSubmit={searchEnergyStar} className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-5">
+          <Field label="Search">
+            <input
+              value={energyStarQuery}
+              onChange={(e) => setEnergyStarQuery(e.target.value)}
+              className={inputCls}
+              placeholder="Brand, model, AHRI"
+              disabled={energyStarSearching}
+            />
+          </Field>
+          <Field label="Default Cost">
+            <input
+              type="number"
+              min={0}
+              step="any"
+              value={energyStarCost}
+              onChange={(e) => setEnergyStarCost(e.target.value)}
+              className={inputCls}
+              disabled={energyStarSearching}
+            />
+          </Field>
+          <Field label="Default Margin %">
+            <input
+              type="number"
+              min={0}
+              step="any"
+              value={energyStarMargin}
+              onChange={(e) => setEnergyStarMargin(e.target.value)}
+              className={inputCls}
+              disabled={energyStarSearching}
+            />
+          </Field>
+          <div className="md:col-span-2 md:self-end">
+            <button
+              type="submit"
+              disabled={energyStarSearching}
+              className="w-full rounded-lg border border-[color:var(--border)] px-4 py-2 text-sm font-semibold text-[color:var(--text)] hover:bg-white/5 disabled:opacity-60"
+            >
+              {energyStarSearching ? "Searching..." : "Search Certified Models"}
+            </button>
+          </div>
+        </form>
+
+        {energyStarResults.length > 0 && (
+          <div className="mt-5 overflow-x-auto rounded-lg border border-[color:var(--border)]">
+            <table className="min-w-full divide-y divide-[color:var(--border)] text-sm">
+              <thead className="bg-white/5 text-left text-xs uppercase tracking-wide text-[color:var(--muted)]">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Model</th>
+                  <th className="px-4 py-3 font-semibold">Efficiency</th>
+                  <th className="px-4 py-3 font-semibold">Capacity</th>
+                  <th className="px-4 py-3 font-semibold">Flags</th>
+                  <th className="px-4 py-3 text-right font-semibold">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[color:var(--border)]">
+                {energyStarResults.map((result) => (
+                  <tr key={result.sourceProductId} className="align-top">
+                    <td className="px-4 py-3">
+                      <p className="font-medium text-[color:var(--text)]">
+                        {result.brand} {result.modelNumber}
+                      </p>
+                      <p className="text-xs text-[color:var(--muted)]">
+                        {[result.productType, result.seriesName, result.ahriReferenceNumber ? `AHRI ${result.ahriReferenceNumber}` : null]
+                          .filter(Boolean)
+                          .join(" / ") || "Certified heat pump"}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-[color:var(--muted)]">
+                      {result.efficiencyRating || "No efficiency listed"}
+                    </td>
+                    <td className="px-4 py-3 text-[color:var(--muted)]">
+                      <p>{result.sizeTonnage || "No tonnage listed"}</p>
+                      <p className="text-xs">
+                        {formatBtu(result.coolingCapacityBtu)}
+                        {result.heatingCapacityBtu47 ? ` cooling / ${formatBtu(result.heatingCapacityBtu47)} heat at 47F` : ""}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        <SpecBadge label="ENERGY STAR" tone="emerald" />
+                        {result.coldClimate && <SpecBadge label="Cold climate" tone="blue" />}
+                        {result.taxCreditEligible && <SpecBadge label="Tax credit" tone="amber" />}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => importEnergyStarResult(result)}
+                        disabled={energyStarImportingId === result.sourceProductId}
+                        className="rounded-lg border border-[color:var(--border)] px-3 py-1.5 text-xs font-semibold text-[color:var(--text)] hover:bg-white/5 disabled:opacity-60"
+                      >
+                        {energyStarImportingId === result.sourceProductId ? "Importing..." : "Import"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-5">
         <h2 className="text-lg font-semibold text-[color:var(--text)]">
           CSV Import / Export
         </h2>
@@ -625,6 +873,17 @@ export default function CatalogPage() {
                       <p className="text-xs text-[color:var(--muted)]">
                         {[item.sizeTonnage, item.efficiencyRating].filter(Boolean).join(" / ") || "No specs set"}
                       </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {item.sourceProvider !== "MANUAL" && (
+                          <SpecBadge label={formatEnum(item.sourceProvider)} tone="slate" />
+                        )}
+                        {item.energyStarCertified && <SpecBadge label="ENERGY STAR" tone="emerald" />}
+                        {item.coldClimate && <SpecBadge label="Cold climate" tone="blue" />}
+                        {item.taxCreditEligible && <SpecBadge label="Tax credit" tone="amber" />}
+                        {item.ahriReferenceNumber && (
+                          <SpecBadge label={`AHRI ${item.ahriReferenceNumber}`} tone="slate" />
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-4 text-[color:var(--muted)]">
                       {formatEnum(item.equipmentType)}
@@ -695,6 +954,29 @@ function Field({
   );
 }
 
+function SpecBadge({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "emerald" | "blue" | "amber" | "slate";
+}) {
+  const toneCls =
+    tone === "emerald"
+      ? "bg-emerald-500/10 text-emerald-300"
+      : tone === "blue"
+        ? "bg-blue-500/10 text-blue-300"
+        : tone === "amber"
+          ? "bg-amber-500/10 text-amber-300"
+          : "bg-white/10 text-[color:var(--muted)]";
+
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${toneCls}`}>
+      {label}
+    </span>
+  );
+}
+
 function cleanOptional(value: string) {
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
@@ -731,4 +1013,9 @@ function formatCurrency(value: number) {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+function formatBtu(value: number | null) {
+  if (!value) return "No capacity listed";
+  return `${value.toLocaleString()} BTU/h`;
 }

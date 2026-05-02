@@ -19,6 +19,15 @@ const {
 vi.mock("@/lib/session", () => ({
   requireInternalUser: requireInternalUserMock,
   authErrorToHttp: authErrorToHttpMock,
+  isHvacRole: (role: string) => role === "HVAC_OWNER" || role === "HVAC_SALES",
+  AuthError: class AuthError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+      super(message);
+      this.status = status;
+    }
+  },
 }));
 
 vi.mock("@/lib/prisma", () => ({
