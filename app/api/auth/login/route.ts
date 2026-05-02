@@ -1,10 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   verifyPassword,
   generateSessionToken,
   getSessionExpiration,
 } from "@/lib/auth";
+
+function getDevelopmentDiagnostic(error: unknown): string | undefined {
+  if (error instanceof Prisma.PrismaClientInitializationError) {
+    return "Database connection failed. Check DATABASE_URL and confirm PostgreSQL is running.";
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2021") {
+      return "An auth table is missing. Run prisma migrate deploy against the configured database.";
+    }
+
+    if (error.code === "P2022") {
+      return "The auth schema is out of date. Regenerate Prisma Client and re-run migrations.";
+    }
+
+    return `Prisma request failed with code ${error.code}.`;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return undefined;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,7 +50,7 @@ export async function POST(request: NextRequest) {
     if (!user || !user.isActive) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -33,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (!verifyPassword(password, user.password)) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -78,10 +103,17 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    const isDevelopment = process.env.NODE_ENV !== "production";
+
     console.error("Login error:", error);
     return NextResponse.json(
-      { error: "Authentication failed" },
-      { status: 500 }
+      {
+        error: "Authentication failed",
+        ...(isDevelopment
+          ? { diagnostic: getDevelopmentDiagnostic(error) }
+          : {}),
+      },
+      { status: 500 },
     );
   }
 }

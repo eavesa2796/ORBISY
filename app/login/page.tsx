@@ -7,6 +7,25 @@ import Image from "next/image";
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = "force-dynamic";
 
+type LoginUserRole =
+  | "ORBISY_ADMIN"
+  | "ORBISY_SALES"
+  | "HVAC_OWNER"
+  | "HVAC_SALES"
+  | "HOMEOWNER";
+
+function getDefaultCallbackUrl(role: LoginUserRole) {
+  if (role === "HOMEOWNER") {
+    return "/portal";
+  }
+
+  if (role === "HVAC_OWNER" || role === "HVAC_SALES") {
+    return "/pro";
+  }
+
+  return "/console";
+}
+
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,10 +50,19 @@ function LoginForm() {
       });
 
       if (response.ok) {
-        router.push(callbackUrl);
+        const data = await response.json();
+        const destination =
+          searchParams.get("callbackUrl") ||
+          getDefaultCallbackUrl(data.user.role as LoginUserRole);
+
+        router.push(destination || callbackUrl);
       } else {
         const data = await response.json();
-        setError(data.error || "Login failed");
+        const message = data.diagnostic
+          ? `${data.error}: ${data.diagnostic}`
+          : data.error || "Login failed";
+
+        setError(message);
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

@@ -7,14 +7,19 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
-console.log("🔧 Initializing Prisma Client with PostgreSQL adapter...");
-console.log("📍 DATABASE_URL exists:", !!process.env.DATABASE_URL);
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL is not set. Copy .env.example to .env.local or .env before starting the app.",
+  );
+}
 
 // Create connection pool
 const pool =
   globalForPrisma.pool ??
   new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: databaseUrl,
   });
 
 // Create Prisma adapter

@@ -1,13 +1,26 @@
 /**
  * Setup script to create the first ORBISY admin user
- * Run this with: node scripts/create-admin.mjs
+ * Run this with: npm run db:create-admin
  */
 
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { createHash } from "crypto";
 import { createInterface } from "readline";
+import pg from "pg";
+import { loadEnvFiles, requireEnv } from "./load-env.mjs";
 
-const prisma = new PrismaClient();
+const { Pool } = pg;
+
+loadEnvFiles();
+
+const pool = new Pool({
+  connectionString: requireEnv("DATABASE_URL"),
+});
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg(pool),
+});
 
 function hashPassword(password) {
   return createHash("sha256").update(password).digest("hex");
@@ -24,6 +37,11 @@ function question(query) {
 
 async function main() {
   console.log("=== Create ORBISY Admin User ===\n");
+
+  const loadedFiles = loadEnvFiles();
+  console.log(
+    `Loaded environment from: ${loadedFiles.length > 0 ? loadedFiles.join(", ") : "none"}`,
+  );
 
   const name = await question("Enter admin name: ");
   const email = await question("Enter admin email: ");
@@ -66,4 +84,5 @@ main()
   .finally(async () => {
     rl.close();
     await prisma.$disconnect();
+    await pool.end();
   });
