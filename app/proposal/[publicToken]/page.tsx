@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import {
   serializePublicProposalForPrint,
@@ -59,9 +59,11 @@ export default function PublicProposalPage() {
   const [acceptingOptionId, setAcceptingOptionId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [proposal, setProposal] = useState<PublicPrintProposalInput | null>(null);
+  const trackedOptionIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!publicToken) return;
+    trackedOptionIdsRef.current.clear();
 
     const fetchProposal = async () => {
       setLoading(true);
@@ -99,6 +101,62 @@ export default function PublicProposalPage() {
     if (!printModel) return null;
     return printModel.sortedOptions.find((option) => option.isSelected) || null;
   }, [printModel]);
+
+  const proposalPublicToken = proposal?.publicToken;
+
+  const trackOptionFocus = useCallback(
+    (option: PrintOption, source = "option_card_visible") => {
+      if (!proposalPublicToken || isPrintMode) return;
+      if (trackedOptionIdsRef.current.has(option.id)) return;
+
+      trackedOptionIdsRef.current.add(option.id);
+
+      void fetch(`/api/proposals/${proposalPublicToken}/engagement`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventType: "OPTION_VIEWED",
+          optionId: option.id,
+          metadata: { source },
+        }),
+      }).catch(() => {
+        // Engagement tracking should never block the customer proposal flow.
+      });
+    },
+    [isPrintMode, proposalPublicToken],
+  );
+
+  useEffect(() => {
+    if (!printModel || isPrintMode) return;
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const optionsById = new Map(printModel.sortedOptions.map((option) => [option.id, option]));
+    const elements = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-proposal-option-id]"),
+    );
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || entry.intersectionRatio < 0.55) continue;
+          const optionId = entry.target.getAttribute("data-proposal-option-id");
+          const option = optionId ? optionsById.get(optionId) : null;
+          if (option) {
+            trackOptionFocus(option, "option_card_visible");
+          }
+        }
+      },
+      { threshold: [0.55] },
+    );
+
+    for (const element of elements) {
+      observer.observe(element);
+    }
+
+    return () => observer.disconnect();
+  }, [isPrintMode, printModel, trackOptionFocus]);
 
   async function acceptOption(optionId: string) {
     if (!proposal || proposal.status === "DECLINED") return;
@@ -258,6 +316,7 @@ export default function PublicProposalPage() {
               isRecommended={recommendedOption?.id === option.id}
               accepting={acceptingOptionId === option.id}
               onAccept={() => acceptOption(option.id)}
+              onFocusOption={() => trackOptionFocus(option, "option_card_interaction")}
             />
           ))}
         </section>
@@ -275,7 +334,10 @@ export default function PublicProposalPage() {
                 </p>
               </div>
               <button
-                onClick={() => acceptOption(recommendedOption.id)}
+                onClick={() => {
+                  trackOptionFocus(recommendedOption, "recommended_sticky_cta");
+                  void acceptOption(recommendedOption.id);
+                }}
                 disabled={acceptingOptionId === recommendedOption.id}
                 className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -316,6 +378,7 @@ function OptionCard({
   isRecommended,
   accepting,
   onAccept,
+  onFocusOption,
 }: {
   option: PrintOption;
   canAccept: boolean;
@@ -323,12 +386,18 @@ function OptionCard({
   isRecommended: boolean;
   accepting: boolean;
   onAccept: () => void;
+  onFocusOption: () => void;
 }) {
   const addons = option.addonLines.filter((line) => line.type === "ADDON");
   const savings = option.addonLines.filter((line) => isSavingsLine(line.type));
 
   return (
-    <article className={`proposal-print-card relative rounded-2xl border p-5 shadow-sm ${tierTone(option)}`}>
+    <article
+      data-proposal-option-id={option.id}
+      onMouseEnter={onFocusOption}
+      onFocusCapture={onFocusOption}
+      className={`proposal-print-card relative rounded-2xl border p-5 shadow-sm ${tierTone(option)}`}
+    >
       {isRecommended && !option.isSelected && (
         <div className="absolute right-4 top-4 rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
           Recommended

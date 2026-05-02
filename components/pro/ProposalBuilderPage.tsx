@@ -55,9 +55,21 @@ type InternalProposal = {
   lastEmailSentAt: string | null;
   lastEmailEventType: "EMAIL_SENT" | "FOLLOW_UP_SENT" | null;
   emailSendCount: number;
+  followUpSendCount: number;
+  maxFollowUps: number;
   needsFollowUp: boolean;
   followUpReason: string | null;
   daysSinceLastTouch: number | null;
+  viewCount: number;
+  lastViewedEventAt: string | null;
+  optionFocusCount: number;
+  mostFocusedOption: {
+    optionId: string | null;
+    tier: "GOOD" | "BETTER" | "BEST" | null;
+    title: string | null;
+    count: number;
+    lastFocusedAt: string;
+  } | null;
   options: Array<{
     id: string;
     tier: "GOOD" | "BETTER" | "BEST";
@@ -710,6 +722,16 @@ export default function ProposalsPage() {
     return `Initial sent ${when}`;
   }
 
+  function optionFocusLabel(proposal: InternalProposal) {
+    const focused = proposal.mostFocusedOption;
+    if (!focused) {
+      return "No package focus yet";
+    }
+
+    const label = [focused.tier, focused.title].filter(Boolean).join(" - ");
+    return `${label || "Package"} (${focused.count} focus${focused.count === 1 ? "" : "es"})`;
+  }
+
   if (loading) {
     return <p className="text-[color:var(--muted)]">Loading proposal builder...</p>;
   }
@@ -1289,6 +1311,17 @@ export default function ProposalsPage() {
                 <div className="grid grid-cols-1 gap-3 text-sm text-[color:var(--muted)] md:grid-cols-2">
                   <p>Email status: {emailStatusLabel(proposal)}</p>
                   <p>Total email sends: {proposal.emailSendCount}</p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 text-sm text-[color:var(--muted)] md:grid-cols-3">
+                  <p>
+                    Proposal views: {proposal.viewCount}
+                    {proposal.lastViewedEventAt ? ` (last ${formatDate(proposal.lastViewedEventAt)})` : ""}
+                  </p>
+                  <p>Package focus: {optionFocusLabel(proposal)}</p>
+                  <p>
+                    Follow-ups sent: {proposal.followUpSendCount}/{proposal.maxFollowUps}
+                  </p>
                 </div>
 
                 {proposal.followUpReason && (

@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { type Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { preparePublicProposalView } from "@/lib/sales/proposals/workflow";
 
 export const runtime = "nodejs";
 
-function serializeProposal(proposal: any) {
+const publicProposalInclude = {
+  company: { select: { id: true, name: true, slug: true } },
+  contact: {
+    select: { id: true, fullName: true, email: true, phone: true },
+  },
+  options: {
+    include: { addonLines: true },
+    orderBy: { sortOrder: "asc" },
+  },
+} satisfies Prisma.SalesProposalInclude;
+
+type PublicProposalWithRelations = Prisma.SalesProposalGetPayload<{
+  include: typeof publicProposalInclude;
+}>;
+
+function serializeProposal(proposal: PublicProposalWithRelations) {
   return {
     id: proposal.id,
     publicToken: proposal.publicToken,
@@ -34,7 +50,7 @@ function serializeProposal(proposal: any) {
         }
       : null,
     selectedOptionId: proposal.selectedOptionId,
-    options: proposal.options.map((option: any) => ({
+    options: proposal.options.map((option) => ({
       id: option.id,
       tier: option.tier,
       title: option.title,
@@ -54,7 +70,7 @@ function serializeProposal(proposal: any) {
       discountsTotal: Number(option.discountsTotal),
       rebatesTotal: Number(option.rebatesTotal),
       finalCustomerPrice: Number(option.finalCustomerPrice),
-      addonLines: option.addonLines.map((line: any) => ({
+      addonLines: option.addonLines.map((line) => ({
         id: line.id,
         type: line.type,
         label: line.label,
@@ -74,16 +90,7 @@ export async function GET(
     const proposal = await prisma.$transaction(async (tx) => {
       const existing = await tx.salesProposal.findUnique({
         where: { publicToken },
-        include: {
-          company: { select: { id: true, name: true, slug: true } },
-          contact: {
-            select: { id: true, fullName: true, email: true, phone: true },
-          },
-          options: {
-            include: { addonLines: true },
-            orderBy: { sortOrder: "asc" },
-          },
-        },
+        include: publicProposalInclude,
       });
 
       if (!existing) {
@@ -96,33 +103,24 @@ export async function GET(
         return { unavailable: true };
       }
 
-      if (preparedView.update && preparedView.event) {
+      if (preparedView.update) {
         await tx.salesProposal.update({
           where: { id: existing.id },
           data: preparedView.update,
         });
-
-        await tx.salesProposalEvent.create({
-          data: {
-            proposalId: existing.id,
-            eventType: preparedView.event.eventType,
-            metadata: preparedView.event.metadata,
-          },
-        });
       }
+
+      await tx.salesProposalEvent.create({
+        data: {
+          proposalId: existing.id,
+          eventType: preparedView.event.eventType,
+          metadata: preparedView.event.metadata,
+        },
+      });
 
       return tx.salesProposal.findUnique({
         where: { id: existing.id },
-        include: {
-          company: { select: { id: true, name: true, slug: true } },
-          contact: {
-            select: { id: true, fullName: true, email: true, phone: true },
-          },
-          options: {
-            include: { addonLines: true },
-            orderBy: { sortOrder: "asc" },
-          },
-        },
+        include: publicProposalInclude,
       });
     });
 

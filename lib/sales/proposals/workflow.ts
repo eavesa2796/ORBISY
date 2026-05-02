@@ -41,11 +41,11 @@ export function preparePublicProposalView(
   now = new Date(),
 ):
   | { available: false }
-  | {
-      available: true;
-      update?: { status: "VIEWED"; viewedAt: Date };
-      event?: { eventType: "VIEWED"; metadata: Prisma.InputJsonValue };
-    } {
+    | {
+        available: true;
+        update?: { status: "VIEWED"; viewedAt: Date };
+        event: { eventType: "VIEWED"; metadata: Prisma.InputJsonValue };
+      } {
   if (proposal.status === "DRAFT") {
     return { available: false };
   }
@@ -60,10 +60,24 @@ export function preparePublicProposalView(
       },
       event: {
         eventType: "VIEWED",
-        metadata: { source: "public_page_open", firstView: true },
+        metadata: {
+          source: "public_page_open",
+          firstView: true,
+          statusAtOpen: proposal.status,
+        },
       },
     };
   }
 
-  return { available: true };
+  return {
+    available: true,
+    event: {
+      eventType: "VIEWED",
+      metadata: {
+        source: "public_page_open",
+        firstView: false,
+        statusAtOpen: proposal.status,
+      },
+    },
+  };
 }

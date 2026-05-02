@@ -12,6 +12,7 @@ import { createHmac } from "crypto";
  */
 export function verifyCronSecret(request: Request): boolean {
   const secret = request.headers.get("x-orbisy-cron-secret");
+  const authorization = request.headers.get("authorization");
   const expectedSecret = process.env.CRON_SECRET;
 
   if (!expectedSecret) {
@@ -19,7 +20,7 @@ export function verifyCronSecret(request: Request): boolean {
     return false;
   }
 
-  return secret === expectedSecret;
+  return secret === expectedSecret || authorization === `Bearer ${expectedSecret}`;
 }
 
 /**

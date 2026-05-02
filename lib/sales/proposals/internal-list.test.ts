@@ -77,6 +77,7 @@ describe("internal proposal list serialization", () => {
     expect(result.lastEmailEventType).toBe("FOLLOW_UP_SENT");
     expect(result.lastEmailSentAt?.toISOString()).toBe("2026-05-01T15:00:00.000Z");
     expect(result.emailSendCount).toBe(2);
+    expect(result.followUpSendCount).toBe(1);
     expect(result.needsFollowUp).toBe(false);
     expect(result.publicUrl).toBe(
       buildInternalPublicProposalUrl("https://orbisy.example.com", "token_1"),
@@ -161,5 +162,106 @@ describe("internal proposal list serialization", () => {
     expect(accepted.daysSinceLastTouch).toBeNull();
     expect(declined.needsFollowUp).toBe(false);
     expect(declined.daysSinceLastTouch).toBeNull();
+  });
+
+  it("summarizes public views and most-focused proposal option", () => {
+    const result = serializeInternalProposal(
+      buildBaseProposal({
+        viewedAt: new Date("2026-05-01T12:00:00.000Z"),
+        events: [
+          {
+            eventType: "VIEWED",
+            occurredAt: new Date("2026-05-01T12:00:00.000Z"),
+          },
+          {
+            eventType: "VIEWED",
+            occurredAt: new Date("2026-05-01T13:00:00.000Z"),
+          },
+          {
+            eventType: "OPTION_VIEWED",
+            occurredAt: new Date("2026-05-01T13:01:00.000Z"),
+            metadata: {
+              optionId: "option_better",
+              tier: "BETTER",
+              title: "Better Comfort",
+            },
+          },
+          {
+            eventType: "OPTION_VIEWED",
+            occurredAt: new Date("2026-05-01T13:02:00.000Z"),
+            metadata: {
+              optionId: "option_better",
+              tier: "BETTER",
+              title: "Better Comfort",
+            },
+          },
+          {
+            eventType: "OPTION_VIEWED",
+            occurredAt: new Date("2026-05-01T13:03:00.000Z"),
+            metadata: {
+              optionId: "option_good",
+              tier: "GOOD",
+              title: "Good Comfort",
+            },
+          },
+        ],
+        options: [
+          {
+            id: "option_good",
+            tier: "GOOD",
+            title: "Good Comfort",
+            finalCustomerPrice: 9800,
+            grossMarginPercent: 31,
+          },
+          {
+            id: "option_better",
+            tier: "BETTER",
+            title: "Better Comfort",
+            finalCustomerPrice: 12800,
+            grossMarginPercent: 34,
+          },
+        ],
+      }),
+      "https://orbisy.example.com",
+      { now: NOW, followUpDays: 2 },
+    );
+
+    expect(result.viewCount).toBe(2);
+    expect(result.lastViewedEventAt?.toISOString()).toBe("2026-05-01T13:00:00.000Z");
+    expect(result.optionFocusCount).toBe(3);
+    expect(result.mostFocusedOption).toMatchObject({
+      optionId: "option_better",
+      tier: "BETTER",
+      title: "Better Comfort",
+      count: 2,
+    });
+  });
+
+  it("does not request more follow-ups after max follow-up count", () => {
+    const result = serializeInternalProposal(
+      buildBaseProposal({
+        status: "VIEWED",
+        events: [
+          {
+            eventType: "EMAIL_SENT",
+            occurredAt: new Date("2026-04-20T08:00:00.000Z"),
+          },
+          {
+            eventType: "FOLLOW_UP_SENT",
+            occurredAt: new Date("2026-04-23T08:00:00.000Z"),
+          },
+          {
+            eventType: "FOLLOW_UP_SENT",
+            occurredAt: new Date("2026-04-26T08:00:00.000Z"),
+          },
+        ],
+      }),
+      "https://orbisy.example.com",
+      { now: NOW, followUpDays: 2, maxFollowUps: 2 },
+    );
+
+    expect(result.needsFollowUp).toBe(false);
+    expect(result.followUpSendCount).toBe(2);
+    expect(result.maxFollowUps).toBe(2);
   });
 });

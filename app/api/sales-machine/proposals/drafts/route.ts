@@ -116,11 +116,12 @@ export async function GET(request: NextRequest) {
         selectedOption: { select: { id: true, tier: true, title: true } },
         events: {
           where: {
-            eventType: { in: ["EMAIL_SENT", "FOLLOW_UP_SENT"] },
+            eventType: { in: ["EMAIL_SENT", "FOLLOW_UP_SENT", "VIEWED", "OPTION_VIEWED"] },
           },
           select: {
             eventType: true,
             occurredAt: true,
+            metadata: true,
           },
           orderBy: { occurredAt: "desc" },
         },

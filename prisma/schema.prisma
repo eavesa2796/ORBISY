@@ -326,6 +326,7 @@ enum SalesProposalEventType {
   DECLINED
   EMAIL_SENT
   FOLLOW_UP_SENT
+  OPTION_VIEWED
   STATUS_CHANGED
 }
 
@@ -586,6 +587,7 @@ model SalesProposal {
   createdByUserId   String?
   sentAt            DateTime?
   viewedAt          DateTime?
+  followUpSentAt    DateTime?
   acceptedAt        DateTime?
   declinedAt        DateTime?
   createdAt         DateTime            @default(now())
@@ -602,6 +604,7 @@ model SalesProposal {
   @@index([companyId])
   @@index([contactId])
   @@index([status])
+  @@index([followUpSentAt])
   @@index([createdAt])
 }
 

@@ -139,23 +139,35 @@ export async function POST(
       );
     }
 
-    await prisma.salesProposalEvent.create({
-      data: {
-        proposalId: proposal.id,
-        eventType,
-        metadata: {
-          source: "manual_internal_send",
-          sentByUserId: sessionUserId,
-          messageId: emailResult.data?.id || null,
-          to: contactEmail,
-          from: fromEmail,
-          subject,
-          publicUrl,
-          customerName,
-          companyName: proposal.company.name,
-          opportunityTitle: proposal.opportunity.title,
+    const sentAt = new Date();
+
+    await prisma.$transaction(async (tx) => {
+      await tx.salesProposalEvent.create({
+        data: {
+          proposalId: proposal.id,
+          eventType,
+          occurredAt: sentAt,
+          metadata: {
+            source: "manual_internal_send",
+            sentByUserId: sessionUserId,
+            messageId: emailResult.data?.id || null,
+            to: contactEmail,
+            from: fromEmail,
+            subject,
+            publicUrl,
+            customerName,
+            companyName: proposal.company.name,
+            opportunityTitle: proposal.opportunity.title,
+          },
         },
-      },
+      });
+
+      if (eventType === "FOLLOW_UP_SENT") {
+        await tx.salesProposal.update({
+          where: { id: proposal.id },
+          data: { followUpSentAt: sentAt },
+        });
+      }
     });
 
     return NextResponse.json({
