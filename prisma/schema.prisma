@@ -30,6 +30,8 @@ model User {
   lastLoginAt        DateTime?
 
   sessions           Session[]
+  inviteTokens       InviteToken[] @relation("InviteTokenTargetUser")
+  sentInvites        InviteToken[] @relation("InviteTokenInviter")
   customerCompany    SalesCompany? @relation("CustomerCompanyUsers", fields: [customerCompanyId], references: [id], onDelete: SetNull)
   customerContact    SalesContact? @relation("CustomerContactUsers", fields: [customerContactId], references: [id], onDelete: SetNull)
   createdProposals   SalesProposal[] @relation("SalesProposalCreatedBy")
@@ -51,6 +53,28 @@ model Session {
 
   @@index([token])
   @@index([userId])
+  @@index([expiresAt])
+}
+
+model InviteToken {
+  id                String   @id @default(cuid())
+  userId            String
+  invitedByUserId   String
+  tokenHash         String   @unique
+  email             String
+  role              UserRole
+  customerCompanyId String?
+  customerContactId String?
+  expiresAt         DateTime
+  usedAt            DateTime?
+  createdAt         DateTime @default(now())
+
+  user              User     @relation("InviteTokenTargetUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy         User     @relation("InviteTokenInviter", fields: [invitedByUserId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([invitedByUserId])
+  @@index([email])
   @@index([expiresAt])
 }
 

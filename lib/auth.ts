@@ -27,6 +27,20 @@ export function generateSessionToken(): string {
 }
 
 /**
+ * Generate a random one-time token for invite/setup links
+ */
+export function generateOneTimeToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+/**
+ * Hash a one-time token before persisting to the database
+ */
+export function hashOneTimeToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+/**
  * Get session expiration date (7 days from now)
  */
 export function getSessionExpiration(): Date {

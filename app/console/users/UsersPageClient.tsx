@@ -64,7 +64,6 @@ type CreateFormState = {
   name: string;
   email: string;
   role: UserRole;
-  password: string;
   customerCompanyId: string;
   customerContactId: string;
 };
@@ -73,7 +72,6 @@ const emptyForm: CreateFormState = {
   name: "",
   email: "",
   role: "HOMEOWNER",
-  password: "",
   customerCompanyId: "",
   customerContactId: "",
 };
@@ -136,7 +134,7 @@ export default function UsersPageClient() {
     setMessage(null);
   }
 
-  async function createUser(event: FormEvent<HTMLFormElement>) {
+  async function inviteUser(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
     setMessage(null);
@@ -146,7 +144,6 @@ export default function UsersPageClient() {
         name: form.name,
         email: form.email,
         role: form.role,
-        password: form.password || undefined,
         customerCompanyId: companyLinkedRoles.includes(form.role)
           ? form.customerCompanyId
           : undefined,
@@ -156,19 +153,19 @@ export default function UsersPageClient() {
             : undefined,
       };
 
-      const res = await fetch("/api/users", {
+      const res = await fetch("/api/users/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to create user");
+      if (!res.ok) throw new Error(data.error || "Failed to send invite");
 
       setForm(emptyForm);
       await loadUsers();
       setMessage({
         type: "success",
-        text: `User created. Temporary password: ${data.temporaryPassword}`,
+        text: `Invite sent to ${data.invite.email}.`,
       });
     } catch (error) {
       setMessage({
@@ -221,9 +218,7 @@ export default function UsersPageClient() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[color:var(--text)]">
-            Users
-          </h1>
+          <h1 className="text-3xl font-bold text-[color:var(--text)]">Users</h1>
           <p className="mt-2 text-[color:var(--muted)]">
             Manage ORBISY, HVAC, and homeowner access.
           </p>
@@ -251,9 +246,9 @@ export default function UsersPageClient() {
 
       <section className="rounded-xl border border-[color:var(--border)] bg-[color:var(--panel)] p-5">
         <h2 className="text-lg font-semibold text-[color:var(--text)]">
-          Create User
+          Invite User
         </h2>
-        <form onSubmit={createUser} className="mt-5 space-y-4">
+        <form onSubmit={inviteUser} className="mt-5 space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Field label="Name">
               <input
@@ -289,20 +284,14 @@ export default function UsersPageClient() {
                 <option value="HVAC_SALES">HVAC Sales</option>
                 <option value="HVAC_OWNER">HVAC Owner</option>
                 <option value="ORBISY_SALES">ORBISY Sales</option>
-                <option value="ORBISY_ADMIN">ORBISY Admin</option>
               </select>
             </Field>
-            <Field label="Temporary Password">
-              <input
-                type="text"
-                value={form.password}
-                onChange={(e) => updateForm("password", e.target.value)}
-                disabled={saving}
-                placeholder="Leave blank to generate"
-                className={inputCls}
-              />
-            </Field>
           </div>
+
+          <p className="text-xs text-[color:var(--muted)]">
+            Invite-only flow: recipients receive a secure one-time link to set
+            their password.
+          </p>
 
           {companyLinkedRoles.includes(form.role) && (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -349,7 +338,7 @@ export default function UsersPageClient() {
             disabled={saving}
             className="rounded-lg bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-5 py-2.5 font-semibold text-[#001] disabled:opacity-60"
           >
-            {saving ? "Creating..." : "Create User"}
+            {saving ? "Sending invite..." : "Send Invite"}
           </button>
         </form>
       </section>
@@ -375,9 +364,7 @@ export default function UsersPageClient() {
                   <th className="px-5 py-3 font-semibold">Company</th>
                   <th className="px-5 py-3 font-semibold">Last Login</th>
                   <th className="px-5 py-3 font-semibold">Status</th>
-                  <th className="px-5 py-3 text-right font-semibold">
-                    Action
-                  </th>
+                  <th className="px-5 py-3 text-right font-semibold">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border)]">
