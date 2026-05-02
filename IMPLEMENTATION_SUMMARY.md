@@ -6,6 +6,46 @@ The fully automated outreach module has been successfully integrated into ORBISY
 
 ---
 
+## 🧾 Release Update (2026-05-02)
+
+### PR-Style Changelog: Auth + Local DB Setup Stabilization
+
+**Commit:** `6899b9e`  
+**Branch:** `main`  
+**Scope:** local auth reliability, Prisma env consistency, setup docs
+
+**What changed**
+
+- Added shared env loader at `scripts/load-env.mjs` so Prisma CLI and local scripts read `.env.local` (fallback `.env`) consistently.
+- Updated Prisma config (`prisma.config.ts`) to use the shared loader before resolving `DATABASE_URL`.
+- Hardened Prisma singleton (`lib/prisma.ts`) with explicit missing-`DATABASE_URL` failure message.
+- Updated admin seed utility (`scripts/create-admin.mjs`) to:
+  - load env files through shared loader
+  - require `DATABASE_URL`
+  - use Prisma Postgres adapter path (`@prisma/adapter-pg`) to match app runtime
+- Added npm helper scripts in `package.json`:
+  - `db:migrate`
+  - `db:generate`
+  - `db:create-admin`
+- Improved login diagnostics in development only (`app/api/auth/login/route.ts`) while preserving generic production error behavior.
+- Added role-aware post-login default routing (`app/login/page.tsx`):
+  - `ORBISY_ADMIN`, `ORBISY_SALES` → `/console`
+  - `HVAC_OWNER`, `HVAC_SALES` → `/pro`
+  - `HOMEOWNER` → `/portal`
+- Refreshed setup guidance in `README.md` and `.env.example` for local bootstrap flow.
+
+**Verification performed**
+
+- Prisma migrations deployed successfully, including:
+  - `20260501200000_split_user_roles`
+  - `20260502120000_proposal_engagement_followups`
+- Prisma client generated successfully.
+- Test suite passed: 60/60 tests.
+- TypeScript check passed: `tsc --noEmit`.
+- Confirmed active `ORBISY_ADMIN` user exists for local login validation.
+
+---
+
 ## 📦 What Was Delivered
 
 ### 1. Database Schema (7 New Models)
