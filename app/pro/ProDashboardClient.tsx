@@ -179,12 +179,18 @@ export default function ProDashboardClient({
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
           <Link
             href="/pro/proposals"
             className="rounded-lg bg-[linear-gradient(135deg,var(--accent),var(--accent-2))] px-4 py-3 text-center font-semibold text-[#001]"
           >
             Create Proposal
+          </Link>
+          <Link
+            href="/pro/recovery"
+            className="rounded-lg border border-[color:var(--border)] bg-white/5 px-4 py-3 text-center font-semibold text-[color:var(--text)] hover:bg-white/10"
+          >
+            Open Recovery Queue
           </Link>
           <Link
             href="/pro/proposals"

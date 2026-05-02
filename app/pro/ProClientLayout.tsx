@@ -41,6 +41,9 @@ export default function ProClientLayout({
           <NavLink href="/pro" icon="PD">
             Pro Dashboard
           </NavLink>
+          <NavLink href="/pro/recovery" icon="RR">
+            Revenue Recovery
+          </NavLink>
           <NavLink href="/pro/catalog" icon="CA">
             Catalog
           </NavLink>
