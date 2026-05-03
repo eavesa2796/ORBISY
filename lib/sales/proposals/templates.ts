@@ -14,6 +14,11 @@ export type ProposalTemplateTierDefault = {
   tier: "GOOD" | "BETTER" | "BEST";
   title: string;
   laborCost: number;
+  pricingMode?: "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
+  marginPercent?: number;
+  sellPrice?: number | null;
+  permitFee?: number;
+  taxRatePercent?: number;
   warrantyLabel: string;
   financingApr: number;
   financingMonths: number;
@@ -52,6 +57,7 @@ function defaultsFor(tier: "GOOD" | "BETTER" | "BEST") {
   if (tier === "GOOD") {
     return {
       laborCost: 1200,
+      marginPercent: 35,
       financingApr: 8.99,
       financingMonths: 120,
       warrantyLabel: "10-year parts",
@@ -60,6 +66,7 @@ function defaultsFor(tier: "GOOD" | "BETTER" | "BEST") {
   if (tier === "BETTER") {
     return {
       laborCost: 1500,
+      marginPercent: 40,
       financingApr: 8.49,
       financingMonths: 120,
       warrantyLabel: "10-year parts + 2-year labor",
@@ -67,6 +74,7 @@ function defaultsFor(tier: "GOOD" | "BETTER" | "BEST") {
   }
   return {
     laborCost: 1800,
+    marginPercent: 45,
     financingApr: 7.49,
     financingMonths: 144,
     warrantyLabel: "10-year parts + 10-year labor",
@@ -84,6 +92,9 @@ function buildTier(
     tier,
     title,
     laborCost: shared.laborCost,
+    pricingMode: "COST_PLUS_MARGIN",
+    marginPercent: shared.marginPercent,
+    sellPrice: null,
     warrantyLabel: shared.warrantyLabel,
     financingApr: shared.financingApr,
     financingMonths: shared.financingMonths,
@@ -301,6 +312,11 @@ export function applyTemplateToTierDefaults(
       tier,
       title: override?.title ?? base.title,
       laborCost: override?.laborCost ?? base.laborCost,
+      pricingMode: override?.pricingMode ?? base.pricingMode,
+      marginPercent: override?.marginPercent ?? base.marginPercent,
+      sellPrice: override?.sellPrice ?? base.sellPrice,
+      permitFee: override?.permitFee ?? base.permitFee,
+      taxRatePercent: override?.taxRatePercent ?? base.taxRatePercent,
       warrantyLabel: override?.warrantyLabel ?? base.warrantyLabel,
       financingApr: override?.financingApr ?? base.financingApr,
       financingMonths: override?.financingMonths ?? base.financingMonths,

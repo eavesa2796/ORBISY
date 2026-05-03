@@ -152,6 +152,11 @@ type ProposalTemplate = {
     tier: "GOOD" | "BETTER" | "BEST";
     title: string;
     laborCost: number;
+    pricingMode?: "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
+    marginPercent?: number;
+    sellPrice?: number | null;
+    permitFee?: number;
+    taxRatePercent?: number;
     warrantyLabel: string;
     financingApr: number;
     financingMonths: number;
@@ -178,6 +183,11 @@ type TemplateDraftTier = {
   tier: "GOOD" | "BETTER" | "BEST";
   title: string;
   laborCost?: number | null;
+  pricingMode?: "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
+  marginPercent?: number | null;
+  sellPrice?: number | null;
+  permitFee?: number | null;
+  taxRatePercent?: number | null;
   warrantyLabel?: string | null;
   financingApr?: number | null;
   financingMonths?: number | null;
@@ -238,6 +248,10 @@ export default function ProposalsPage() {
   );
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [templateLoading, setTemplateLoading] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [templateSaveName, setTemplateSaveName] = useState("");
+  const [templateSaveJobType, setTemplateSaveJobType] = useState<ProposalTemplate["jobType"]>("CUSTOM");
+  const [templateSaveDescription, setTemplateSaveDescription] = useState("");
   const [catalogSearch, setCatalogSearch] = useState("");
   const [equipmentTypeFilter, setEquipmentTypeFilter] = useState("");
   const [brandFilter, setBrandFilter] = useState("");
@@ -560,16 +574,16 @@ export default function ProposalsPage() {
           title: entry.title,
           equipmentItemId: "",
           laborCost: String(entry.laborCost ?? 0),
-          pricingMode: "COST_PLUS_MARGIN",
-          marginPercent: "35",
-          sellPrice: "",
+          pricingMode: entry.pricingMode || "COST_PLUS_MARGIN",
+          marginPercent: String(entry.marginPercent ?? 35),
+          sellPrice: entry.sellPrice === null || entry.sellPrice === undefined ? "" : String(entry.sellPrice),
           financingApr: String(entry.financingApr ?? ""),
           financingMonths: String(entry.financingMonths ?? ""),
           addon: String(addonTotal),
           discount: String(discountTotal),
           rebate: String(rebateTotal),
-          permitFee: String(proposalSettings.permitFeeDefault),
-          taxRatePercent: String(proposalSettings.taxRatePercent),
+          permitFee: String(entry.permitFee ?? proposalSettings.permitFeeDefault),
+          taxRatePercent: String(entry.taxRatePercent ?? proposalSettings.taxRatePercent),
           warrantyLabel: entry.warrantyLabel || "",
         } as TierForm;
       });
@@ -582,6 +596,60 @@ export default function ProposalsPage() {
       setResultMessage(error instanceof Error ? error.message : "Unexpected error");
     } finally {
       setTemplateLoading(false);
+    }
+  }
+
+  async function saveCurrentTemplate() {
+    const name = templateSaveName.trim();
+    if (!name) {
+      setResultMessage("Enter a template name before saving.");
+      return;
+    }
+
+    setSavingTemplate(true);
+    setResultMessage(null);
+    try {
+      const res = await fetch("/api/sales-machine/proposals/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          jobType: templateSaveJobType,
+          description: templateSaveDescription.trim(),
+          isActive: true,
+          tiers: tiers.map((tier) => ({
+            tier: tier.tier,
+            title: tier.title,
+            laborCost: Number(tier.laborCost || 0),
+            pricingMode: tier.pricingMode,
+            marginPercent: Number(tier.marginPercent || 0),
+            sellPrice: tier.sellPrice ? Number(tier.sellPrice) : null,
+            permitFee: Number(tier.permitFee || 0),
+            taxRatePercent: Number(tier.taxRatePercent || 0),
+            warrantyLabel: tier.warrantyLabel,
+            financingApr: Number(tier.financingApr || 0),
+            financingMonths: Number(tier.financingMonths || 0),
+            pricingNotes: `${tier.pricingMode === "FIXED_SELL_PRICE" ? "Fixed price" : "Cost plus margin"} default saved from builder.`,
+            defaultAddons: [
+              { type: "ADDON", label: "Add-ons", amount: Number(tier.addon || 0) },
+              { type: "DISCOUNT", label: "Discount", amount: Number(tier.discount || 0) },
+              { type: "REBATE", label: "Rebate", amount: Number(tier.rebate || 0) },
+            ].filter((line) => line.amount > 0),
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save template");
+
+      setTemplates((prev) => [...prev.filter((template) => template.id !== data.template.id), data.template]);
+      setSelectedTemplateId(data.template.id);
+      setTemplateSaveName("");
+      setTemplateSaveDescription("");
+      setResultMessage(`Template saved: ${data.template.name}`);
+    } catch (error) {
+      setResultMessage(error instanceof Error ? error.message : "Unexpected error");
+    } finally {
+      setSavingTemplate(false);
     }
   }
 
@@ -867,6 +935,42 @@ export default function ProposalsPage() {
             ))}
           </div>
         )}
+
+        <div className="rounded-lg border border-[color:var(--border)] bg-white/5 p-3 space-y-3">
+          <p className="text-sm font-semibold text-[color:var(--text)]">Save Current Setup as Template</p>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+            <input
+              value={templateSaveName}
+              onChange={(e) => setTemplateSaveName(e.target.value)}
+              placeholder="Template name"
+              className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
+            />
+            <select
+              value={templateSaveJobType}
+              onChange={(e) => setTemplateSaveJobType(e.target.value as ProposalTemplate["jobType"])}
+              className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
+            >
+              <option value="AC_REPLACEMENT">AC Replacement</option>
+              <option value="FURNACE_REPLACEMENT">Furnace Replacement</option>
+              <option value="HEAT_PUMP_REPLACEMENT">Heat Pump Replacement</option>
+              <option value="FULL_SYSTEM_REPLACEMENT">Full System Replacement</option>
+              <option value="CUSTOM">Custom</option>
+            </select>
+            <input
+              value={templateSaveDescription}
+              onChange={(e) => setTemplateSaveDescription(e.target.value)}
+              placeholder="Short description"
+              className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
+            />
+            <button
+              onClick={saveCurrentTemplate}
+              disabled={savingTemplate}
+              className="rounded-lg border border-[color:var(--border)] px-4 py-2 text-sm font-semibold disabled:opacity-60"
+            >
+              {savingTemplate ? "Saving..." : "Save Template"}
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <select

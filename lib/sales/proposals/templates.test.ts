@@ -20,6 +20,11 @@ function buildTemplate(): ProposalTemplate {
         tier: "GOOD",
         title: "Good",
         laborCost: 1000,
+        pricingMode: "COST_PLUS_MARGIN",
+        marginPercent: 35,
+        sellPrice: null,
+        permitFee: 150,
+        taxRatePercent: 8,
         warrantyLabel: "10-year parts",
         financingApr: 8.99,
         financingMonths: 120,
@@ -30,6 +35,11 @@ function buildTemplate(): ProposalTemplate {
         tier: "BETTER",
         title: "Better",
         laborCost: 1400,
+        pricingMode: "COST_PLUS_MARGIN",
+        marginPercent: 40,
+        sellPrice: null,
+        permitFee: 175,
+        taxRatePercent: 8.25,
         warrantyLabel: "10-year + 2-year labor",
         financingApr: 8.49,
         financingMonths: 120,
@@ -40,6 +50,11 @@ function buildTemplate(): ProposalTemplate {
         tier: "BEST",
         title: "Best",
         laborCost: 1800,
+        pricingMode: "FIXED_SELL_PRICE",
+        marginPercent: 45,
+        sellPrice: 18000,
+        permitFee: 200,
+        taxRatePercent: 8.5,
         warrantyLabel: "10-year + 10-year labor",
         financingApr: 7.49,
         financingMonths: 144,
@@ -65,6 +80,11 @@ describe("proposal template application", () => {
         tier: "BETTER",
         title: "Better Custom",
         laborCost: 1650,
+        pricingMode: "FIXED_SELL_PRICE",
+        marginPercent: 44,
+        sellPrice: 15000,
+        permitFee: 250,
+        taxRatePercent: 7.75,
         financingApr: 6.99,
         financingMonths: 132,
         warrantyLabel: "12-year parts",
@@ -75,6 +95,11 @@ describe("proposal template application", () => {
     const better = applied.find((entry) => entry.tier === "BETTER");
     expect(better?.title).toBe("Better Custom");
     expect(better?.laborCost).toBe(1650);
+    expect(better?.pricingMode).toBe("FIXED_SELL_PRICE");
+    expect(better?.marginPercent).toBe(44);
+    expect(better?.sellPrice).toBe(15000);
+    expect(better?.permitFee).toBe(250);
+    expect(better?.taxRatePercent).toBe(7.75);
     expect(better?.financingApr).toBe(6.99);
     expect(better?.financingMonths).toBe(132);
     expect(better?.warrantyLabel).toBe("12-year parts");
