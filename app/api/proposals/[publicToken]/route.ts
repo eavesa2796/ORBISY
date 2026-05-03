@@ -6,7 +6,17 @@ import { preparePublicProposalView } from "@/lib/sales/proposals/workflow";
 export const runtime = "nodejs";
 
 const publicProposalInclude = {
-  company: { select: { id: true, name: true, slug: true } },
+  company: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      website: true,
+      phone: true,
+      logoUrl: true,
+      brandColor: true,
+    },
+  },
   contact: {
     select: { id: true, fullName: true, email: true, phone: true },
   },
@@ -39,6 +49,10 @@ function serializeProposal(proposal: PublicProposalWithRelations) {
           id: proposal.company.id,
           name: proposal.company.name,
           slug: proposal.company.slug,
+          website: proposal.company.website,
+          phone: proposal.company.phone,
+          logoUrl: proposal.company.logoUrl,
+          brandColor: proposal.company.brandColor,
         }
       : null,
     contact: proposal.contact

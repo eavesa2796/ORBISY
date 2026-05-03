@@ -44,7 +44,13 @@ export type PublicPrintProposalInput = {
   viewedAt: string | null;
   acceptedAt: string | null;
   selectedOptionId: string | null;
-  company: { name: string } | null;
+  company: {
+    name: string;
+    website?: string | null;
+    phone?: string | null;
+    logoUrl?: string | null;
+    brandColor?: string | null;
+  } | null;
   contact: {
     fullName: string | null;
     email: string | null;

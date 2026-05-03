@@ -33,6 +33,25 @@ function formatDateTime(value: string | null) {
   }).format(new Date(value));
 }
 
+function formatWebsite(value?: string | null) {
+  if (!value) return "-";
+  try {
+    return new URL(value).hostname.replace(/^www\./, "");
+  } catch {
+    return value;
+  }
+}
+
+function optionSavingsTotal(option: PrintOption) {
+  return option.priceBreakdown.discountsTotal + option.priceBreakdown.rebatesTotal;
+}
+
+function monthlyPaymentLabel(option: PrintOption) {
+  if (!option.monthlyPaymentEstimate) return "-";
+  const term = option.financingMonths ? ` / ${option.financingMonths} mo` : "/mo";
+  return `${currency(option.monthlyPaymentEstimate)}${term}`;
+}
+
 function tierSubhead(tier: PrintOption["tier"]) {
   if (tier === "GOOD") return "Essential comfort";
   if (tier === "BETTER") return "Recommended balance";
@@ -214,6 +233,7 @@ export default function PublicProposalPage() {
   }
 
   const canAccept = proposal.status !== "ACCEPTED" && proposal.status !== "DECLINED";
+  const brandColor = proposal.company?.brandColor || "#2563eb";
 
   return (
     <div
@@ -227,9 +247,36 @@ export default function PublicProposalPage() {
         <header className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="grid gap-0 lg:grid-cols-[1.6fr_1fr]">
             <div className="p-6 md:p-8">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-                HVAC Replacement Proposal
-              </p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  {proposal.company?.logoUrl ? (
+                    <div
+                      aria-label={`${proposal.company.name} logo`}
+                      className="h-13 w-13 rounded-xl border border-slate-200 bg-white bg-contain bg-center bg-no-repeat p-1"
+                      style={{ backgroundImage: `url("${proposal.company.logoUrl}")` }}
+                    />
+                  ) : (
+                    <div
+                      className="flex h-13 w-13 items-center justify-center rounded-xl text-lg font-semibold text-white"
+                      style={{ backgroundColor: brandColor }}
+                    >
+                      {(proposal.company?.name || "HVAC").slice(0, 1)}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
+                      HVAC Replacement Proposal
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-slate-700">
+                      Prepared by {proposal.company?.name || "your HVAC professional"}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-slate-600 sm:text-right">
+                  <p>{proposal.company?.phone || "Contact information in proposal"}</p>
+                  <p>{formatWebsite(proposal.company?.website)}</p>
+                </div>
+              </div>
               <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-slate-950 md:text-5xl">
                 {proposal.title}
               </h1>
@@ -306,6 +353,43 @@ export default function PublicProposalPage() {
           </div>
         )}
 
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Compare Options
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+                Pick the package that fits your comfort goals and budget.
+              </h2>
+            </div>
+            {recommendedOption && (
+              <p className="text-sm text-slate-600 md:max-w-sm md:text-right">
+                Recommended: <span className="font-semibold text-slate-950">{recommendedOption.title}</span>{" "}
+                at {currency(recommendedOption.finalCustomerPrice)}
+                {recommendedOption.monthlyPaymentEstimate
+                  ? ` or ${currency(recommendedOption.monthlyPaymentEstimate)}/mo`
+                  : ""}.
+              </p>
+            )}
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+            {printModel.sortedOptions.map((option) => (
+              <ComparisonOption
+                key={option.id}
+                option={option}
+                isRecommended={recommendedOption?.id === option.id}
+                isPrintMode={isPrintMode}
+                canAccept={canAccept}
+                accepting={acceptingOptionId === option.id}
+                onAccept={() => acceptOption(option.id)}
+                onFocusOption={() => trackOptionFocus(option, "comparison_card_interaction")}
+              />
+            ))}
+          </div>
+        </section>
+
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {printModel.sortedOptions.map((option) => (
             <OptionCard
@@ -367,6 +451,93 @@ function Info({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="mt-1 font-medium text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function ComparisonOption({
+  option,
+  isRecommended,
+  isPrintMode,
+  canAccept,
+  accepting,
+  onAccept,
+  onFocusOption,
+}: {
+  option: PrintOption;
+  isRecommended: boolean;
+  isPrintMode: boolean;
+  canAccept: boolean;
+  accepting: boolean;
+  onAccept: () => void;
+  onFocusOption: () => void;
+}) {
+  const savingsTotal = optionSavingsTotal(option);
+
+  return (
+    <article
+      onMouseEnter={onFocusOption}
+      onFocusCapture={onFocusOption}
+      className={`rounded-2xl border p-4 ${
+        isRecommended
+          ? "border-blue-500 bg-blue-50"
+          : option.isSelected
+            ? "border-emerald-500 bg-emerald-50"
+            : "border-slate-200 bg-slate-50"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {option.tier}
+          </p>
+          <h3 className="mt-1 text-lg font-semibold text-slate-950">
+            {option.title}
+          </h3>
+        </div>
+        {isRecommended && (
+          <span className="rounded-full bg-blue-600 px-2.5 py-1 text-xs font-semibold text-white">
+            Recommended
+          </span>
+        )}
+      </div>
+
+      <dl className="mt-4 space-y-3 text-sm">
+        <ComparisonRow label="Total" value={currency(option.finalCustomerPrice)} strong />
+        <ComparisonRow label="Monthly" value={monthlyPaymentLabel(option)} />
+        <ComparisonRow label="Equipment" value={option.equipmentLabel || "Included"} />
+        <ComparisonRow label="Warranty" value={option.warrantyLabel || "-"} />
+        <ComparisonRow label="Savings" value={savingsTotal > 0 ? currency(savingsTotal) : "-"} />
+      </dl>
+
+      {!isPrintMode && !option.isSelected && canAccept && (
+        <button
+          onClick={onAccept}
+          disabled={accepting}
+          className="mt-4 w-full rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {accepting ? "Accepting..." : `Choose ${option.tier}`}
+        </button>
+      )}
+    </article>
+  );
+}
+
+function ComparisonRow({
+  label,
+  value,
+  strong = false,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-[5.5rem_1fr] gap-3">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className={strong ? "font-semibold text-slate-950" : "text-slate-700"}>
+        {value}
+      </dd>
     </div>
   );
 }
