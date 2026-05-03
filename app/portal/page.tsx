@@ -72,12 +72,12 @@ export default function PortalHomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc,#edf4ff)] p-6 md:p-10">
+    <div className="p-6 md:p-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="rounded-2xl border border-slate-300 bg-white/90 p-6">
-          <h1 className="text-3xl font-semibold text-slate-900">Your Proposals</h1>
+          <h1 className="text-3xl font-semibold text-slate-900">Your HVAC Proposals</h1>
           <p className="mt-2 text-slate-600">
-            Review your Good, Better, and Best options and accept your preferred solution.
+            Review open estimates, compare Good / Better / Best options, and accept when you are ready.
           </p>
         </header>
 

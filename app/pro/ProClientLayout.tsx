@@ -53,9 +53,6 @@ export default function ProClientLayout({
           <NavLink href="/pro/settings" icon="ST">
             Settings
           </NavLink>
-          <NavLink href="/portal" icon="CP">
-            Customer Portal
-          </NavLink>
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[color:var(--border)]">

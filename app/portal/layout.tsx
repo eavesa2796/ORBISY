@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { validateSession } from "@/lib/session";
+import { isHvacRole, validateSession } from "@/lib/session";
+import PortalClientLayout from "./PortalClientLayout";
 
 export default async function PortalLayout({
   children,
@@ -13,8 +14,11 @@ export default async function PortalLayout({
   }
 
   if (session.userRole !== "HOMEOWNER") {
+    if (isHvacRole(session.userRole)) {
+      redirect("/pro");
+    }
     redirect("/console");
   }
 
-  return <>{children}</>;
+  return <PortalClientLayout>{children}</PortalClientLayout>;
 }
