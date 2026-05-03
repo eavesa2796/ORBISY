@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
+  applyCatalogItemToTierForm,
+  buildCatalogEquipmentLabel,
   buildDefaultTierFormsFromSettings,
   type BuilderTierForm,
 } from "@/lib/sales/proposals/builder-defaults";
@@ -676,6 +678,46 @@ export default function ProposalsPage() {
     });
   }, [catalog, catalogSearch, equipmentTypeFilter, brandFilter, tonnageFilter, efficiencyFilter]);
 
+  const catalogById = useMemo(
+    () => new Map(catalog.map((item) => [item.id, item])),
+    [catalog],
+  );
+
+  function catalogChoicesForTier(tier: TierForm) {
+    const selected = tier.equipmentItemId ? catalogById.get(tier.equipmentItemId) : undefined;
+    if (!selected || filteredCatalog.some((item) => item.id === selected.id)) {
+      return filteredCatalog;
+    }
+
+    return [selected, ...filteredCatalog];
+  }
+
+  function selectCatalogItem(index: number, itemId: string) {
+    const item = itemId ? catalogById.get(itemId) || null : null;
+    setTiers((prev) =>
+      prev.map((tier, tierIndex) =>
+        tierIndex === index ? applyCatalogItemToTierForm(tier, item) : tier,
+      ),
+    );
+  }
+
+  function formatCurrency(value: number | null | undefined) {
+    if (value === null || value === undefined) return "-";
+    return `$${value.toLocaleString()}`;
+  }
+
+  function catalogPricingLabel(item: CatalogItem) {
+    if (item.pricingMode === "FIXED_SELL_PRICE") {
+      return `Fixed sell price ${formatCurrency(item.sellPrice)}`;
+    }
+
+    const margin =
+      item.marginPercent === null || item.marginPercent === undefined
+        ? ""
+        : ` ${item.marginPercent}%`;
+    return `Cost + margin${margin}`;
+  }
+
   const drafts = useMemo(
     () => proposals.filter((proposal) => proposal.status === "DRAFT"),
     [proposals],
@@ -1000,11 +1042,16 @@ export default function ProposalsPage() {
         </div>
 
         <div className="space-y-4">
-          {tiers.map((tier, index) => (
-            <div
-              key={tier.tier}
-              className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4 space-y-3"
-            >
+          {tiers.map((tier, index) => {
+            const selectedCatalogItem = tier.equipmentItemId
+              ? catalogById.get(tier.equipmentItemId)
+              : undefined;
+
+            return (
+              <div
+                key={tier.tier}
+                className="rounded-xl border border-[color:var(--border)] bg-white/5 p-4 space-y-3"
+              >
               <p className="font-semibold">{tier.tier} option</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <input
@@ -1020,19 +1067,13 @@ export default function ProposalsPage() {
 
                 <select
                   value={tier.equipmentItemId}
-                  onChange={(e) => {
-                    const next = [...tiers];
-                    next[index].equipmentItemId = e.target.value;
-                    setTiers(next);
-                  }}
+                  onChange={(e) => selectCatalogItem(index, e.target.value)}
                   className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
                 >
                   <option value="">Select equipment</option>
-                  {filteredCatalog.map((item) => (
+                  {catalogChoicesForTier(tier).map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.brand} {item.modelNumber} ({item.equipmentType}
-                      {item.sizeTonnage ? ` • ${item.sizeTonnage}` : ""}
-                      {item.efficiencyRating ? ` • ${item.efficiencyRating}` : ""})
+                      {buildCatalogEquipmentLabel(item)}
                     </option>
                   ))}
                 </select>
@@ -1181,8 +1222,33 @@ export default function ProposalsPage() {
                   className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
                 />
               </div>
-            </div>
-          ))}
+              {selectedCatalogItem && (
+                <div className="grid grid-cols-1 gap-2 rounded-lg border border-[color:var(--border)] bg-black/20 p-3 text-xs text-[color:var(--muted)] md:grid-cols-4">
+                  <p>
+                    <span className="font-semibold text-[color:var(--text)]">Equipment</span>
+                    <br />
+                    {buildCatalogEquipmentLabel(selectedCatalogItem)}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[color:var(--text)]">Equipment Cost</span>
+                    <br />
+                    {formatCurrency(selectedCatalogItem.cost)}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[color:var(--text)]">Catalog Pricing</span>
+                    <br />
+                    {catalogPricingLabel(selectedCatalogItem)}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[color:var(--text)]">Proposal Snapshot</span>
+                    <br />
+                    Saved into the proposal when the draft is created.
+                  </p>
+                </div>
+              )}
+              </div>
+            );
+          })}
         </div>
 
         <button

@@ -21,6 +21,18 @@ export type BuilderTierForm = {
   warrantyLabel: string;
 };
 
+export type BuilderCatalogItem = {
+  id: string;
+  equipmentType: string;
+  brand: string;
+  modelNumber: string;
+  sizeTonnage?: string | null;
+  efficiencyRating?: string | null;
+  pricingMode: "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
+  sellPrice?: number | null;
+  marginPercent?: number | null;
+};
+
 export function buildDefaultTierFormsFromSettings(
   settings: ProposalPricingSettings = DEFAULT_PROPOSAL_PRICING_SETTINGS,
 ): BuilderTierForm[] {
@@ -77,4 +89,58 @@ export function buildDefaultTierFormsFromSettings(
       warrantyLabel: settings.defaultWarrantyBest,
     },
   ];
+}
+
+export function buildCatalogEquipmentLabel(item: BuilderCatalogItem) {
+  return [
+    item.brand,
+    item.modelNumber,
+    item.equipmentType,
+    item.sizeTonnage,
+    item.efficiencyRating,
+  ]
+    .filter(Boolean)
+    .join(" - ");
+}
+
+export function applyCatalogItemToTierForm(
+  tier: BuilderTierForm,
+  item: BuilderCatalogItem | null,
+): BuilderTierForm {
+  if (!item) {
+    return {
+      ...tier,
+      equipmentItemId: "",
+    };
+  }
+
+  const next: BuilderTierForm = {
+    ...tier,
+    equipmentItemId: item.id,
+    title: `${tier.tier[0]}${tier.tier.slice(1).toLowerCase()} - ${item.brand} ${item.modelNumber}`,
+    pricingMode: item.pricingMode,
+  };
+
+  if (item.pricingMode === "FIXED_SELL_PRICE") {
+    return {
+      ...next,
+      sellPrice:
+        item.sellPrice === null || item.sellPrice === undefined
+          ? tier.sellPrice
+          : String(item.sellPrice),
+      marginPercent:
+        item.marginPercent === null || item.marginPercent === undefined
+          ? tier.marginPercent
+          : String(item.marginPercent),
+    };
+  }
+
+  return {
+    ...next,
+    marginPercent:
+      item.marginPercent === null || item.marginPercent === undefined
+        ? tier.marginPercent
+        : String(item.marginPercent),
+    sellPrice: "",
+  };
 }
