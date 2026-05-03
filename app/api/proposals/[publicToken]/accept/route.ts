@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { sendAcceptedProposalNotification } from "@/lib/sales/proposals/accepted-notification";
 import { assertProposalStatusTransition } from "@/lib/sales/proposals/status";
 
 export const runtime = "nodejs";
@@ -9,7 +10,11 @@ type AcceptProposalPayload = {
   optionId?: string;
 };
 
-function serializeAcceptedProposal(proposal: any) {
+type AcceptedProposal = Prisma.SalesProposalGetPayload<{
+  include: { options: true };
+}>;
+
+function serializeAcceptedProposal(proposal: AcceptedProposal) {
   return {
     id: proposal.id,
     publicToken: proposal.publicToken,
@@ -17,13 +22,20 @@ function serializeAcceptedProposal(proposal: any) {
     selectedOptionId: proposal.selectedOptionId,
     acceptedAt: proposal.acceptedAt,
     opportunityId: proposal.opportunityId,
-    options: proposal.options.map((option: any) => ({
+    options: proposal.options.map((option) => ({
       id: option.id,
       tier: option.tier,
       title: option.title,
       finalCustomerPrice: Number(option.finalCustomerPrice),
     })),
   };
+}
+
+function notificationOrigin(request: NextRequest) {
+  return (
+    process.env.NEXT_PUBLIC_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : new URL(request.url).origin)
+  );
 }
 
 export async function POST(
@@ -35,7 +47,10 @@ export async function POST(
   try {
     const body = (await request.json()) as AcceptProposalPayload;
     if (!body.optionId) {
-      return NextResponse.json({ ok: false, error: "optionId is required" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "optionId is required" },
+        { status: 400 },
+      );
     }
 
     const accepted = await prisma.$transaction(async (tx) => {
@@ -56,7 +71,9 @@ export async function POST(
         return { type: "not_available" as const };
       }
 
-      const selectedOption = proposal.options.find((option) => option.id === body.optionId);
+      const selectedOption = proposal.options.find(
+        (option) => option.id === body.optionId,
+      );
       if (!selectedOption) {
         return { type: "bad_option" as const };
       }
@@ -66,7 +83,10 @@ export async function POST(
       }
 
       if (proposal.status === "ACCEPTED") {
-        if (proposal.selectedOptionId && proposal.selectedOptionId !== body.optionId) {
+        if (
+          proposal.selectedOptionId &&
+          proposal.selectedOptionId !== body.optionId
+        ) {
           return { type: "already_accepted_other_option" as const };
         }
 
@@ -74,7 +94,7 @@ export async function POST(
           where: { id: proposal.id },
           include: { options: { orderBy: { sortOrder: "asc" } } },
         });
-        return { type: "ok" as const, proposal: latest! };
+        return { type: "ok" as const, proposal: latest!, notify: false };
       }
 
       const now = new Date();
@@ -140,20 +160,29 @@ export async function POST(
         },
       });
 
-      return { type: "ok" as const, proposal: latest! };
+      return { type: "ok" as const, proposal: latest!, notify: true };
     });
 
     if (accepted.type === "not_found") {
-      return NextResponse.json({ ok: false, error: "Proposal not found" }, { status: 404 });
+      return NextResponse.json(
+        { ok: false, error: "Proposal not found" },
+        { status: 404 },
+      );
     }
 
     if (accepted.type === "not_available") {
-      return NextResponse.json({ ok: false, error: "Proposal not available" }, { status: 404 });
+      return NextResponse.json(
+        { ok: false, error: "Proposal not available" },
+        { status: 404 },
+      );
     }
 
     if (accepted.type === "bad_option") {
       return NextResponse.json(
-        { ok: false, error: "Selected option does not belong to this proposal" },
+        {
+          ok: false,
+          error: "Selected option does not belong to this proposal",
+        },
         { status: 400 },
       );
     }
@@ -167,18 +196,36 @@ export async function POST(
 
     if (accepted.type === "already_accepted_other_option") {
       return NextResponse.json(
-        { ok: false, error: "Proposal already accepted with a different option" },
+        {
+          ok: false,
+          error: "Proposal already accepted with a different option",
+        },
         { status: 409 },
       );
     }
 
+    const notification = accepted.notify
+      ? await sendAcceptedProposalNotification({
+          proposalId: accepted.proposal.id,
+          origin: notificationOrigin(request),
+        }).catch((error) => ({
+          status: "failed" as const,
+          error: error instanceof Error ? error.message : String(error),
+          recipients: [],
+        }))
+      : { status: "skipped" as const, reason: "Proposal was already accepted" };
+
     return NextResponse.json({
       ok: true,
       proposal: serializeAcceptedProposal(accepted.proposal),
+      notification,
     });
   } catch (error) {
     return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : "Unexpected error" },
+      {
+        ok: false,
+        error: error instanceof Error ? error.message : "Unexpected error",
+      },
       { status: 500 },
     );
   }
