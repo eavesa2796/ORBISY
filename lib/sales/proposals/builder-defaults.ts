@@ -2,6 +2,10 @@ import {
   type ProposalPricingSettings,
   DEFAULT_PROPOSAL_PRICING_SETTINGS,
 } from "./settings-shared";
+import {
+  calculateProposalOptionPricing,
+  type ProposalOptionPricing,
+} from "./pricing";
 
 export type BuilderTierForm = {
   tier: "GOOD" | "BETTER" | "BEST";
@@ -28,6 +32,7 @@ export type BuilderCatalogItem = {
   modelNumber: string;
   sizeTonnage?: string | null;
   efficiencyRating?: string | null;
+  cost: number;
   pricingMode: "FIXED_SELL_PRICE" | "COST_PLUS_MARGIN";
   sellPrice?: number | null;
   marginPercent?: number | null;
@@ -143,4 +148,35 @@ export function applyCatalogItemToTierForm(
         : String(item.marginPercent),
     sellPrice: "",
   };
+}
+
+function numberFromField(value: string): number | undefined {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function moneyFromField(value: string): number {
+  return numberFromField(value) ?? 0;
+}
+
+export function calculateTierFormPricingPreview(
+  tier: BuilderTierForm,
+  item: BuilderCatalogItem | null,
+): ProposalOptionPricing {
+  return calculateProposalOptionPricing({
+    equipmentCost: item ? item.cost : 0,
+    laborCost: moneyFromField(tier.laborCost),
+    permitFee: moneyFromField(tier.permitFee),
+    taxRatePercent: moneyFromField(tier.taxRatePercent),
+    pricingMode: tier.pricingMode,
+    marginPercent: numberFromField(tier.marginPercent),
+    sellPrice: numberFromField(tier.sellPrice),
+    financingApr: numberFromField(tier.financingApr),
+    financingMonths: numberFromField(tier.financingMonths),
+    addons: [
+      { type: "ADDON", amount: moneyFromField(tier.addon) },
+      { type: "DISCOUNT", amount: moneyFromField(tier.discount) },
+      { type: "REBATE", amount: moneyFromField(tier.rebate) },
+    ],
+  });
 }

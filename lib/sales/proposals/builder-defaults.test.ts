@@ -3,6 +3,7 @@ import {
   applyCatalogItemToTierForm,
   buildCatalogEquipmentLabel,
   buildDefaultTierFormsFromSettings,
+  calculateTierFormPricingPreview,
 } from "./builder-defaults";
 
 describe("buildDefaultTierFormsFromSettings", () => {
@@ -43,6 +44,7 @@ describe("applyCatalogItemToTierForm", () => {
       modelNumber: "25VNA4",
       sizeTonnage: "4 ton",
       efficiencyRating: "20 SEER2",
+      cost: 7200,
       pricingMode: "FIXED_SELL_PRICE",
       sellPrice: 12950,
       marginPercent: null,
@@ -62,6 +64,7 @@ describe("applyCatalogItemToTierForm", () => {
         equipmentType: "FURNACE",
         brand: "Trane",
         modelNumber: "S9V2",
+        cost: 4100,
         pricingMode: "COST_PLUS_MARGIN",
         sellPrice: null,
         marginPercent: 42,
@@ -83,8 +86,41 @@ describe("applyCatalogItemToTierForm", () => {
         modelNumber: "EL18XCV",
         sizeTonnage: "3 ton",
         efficiencyRating: "18 SEER2",
+        cost: 5300,
         pricingMode: "COST_PLUS_MARGIN",
       }),
     ).toBe("Lennox - EL18XCV - CONDENSER - 3 ton - 18 SEER2");
+  });
+
+  it("calculates live pricing preview from tier form inputs and catalog cost", () => {
+    const tier = {
+      ...baseTier,
+      laborCost: "2000",
+      pricingMode: "COST_PLUS_MARGIN" as const,
+      marginPercent: "50",
+      addon: "500",
+      discount: "250",
+      rebate: "100",
+      permitFee: "150",
+      taxRatePercent: "8",
+      financingApr: "0",
+      financingMonths: "60",
+    };
+
+    const preview = calculateTierFormPricingPreview(tier, {
+      id: "item_4",
+      equipmentType: "HEAT_PUMP",
+      brand: "Daikin",
+      modelNumber: "DZ6VS",
+      cost: 6000,
+      pricingMode: "COST_PLUS_MARGIN",
+      marginPercent: 50,
+    });
+
+    expect(preview.totalCost).toBe(8650);
+    expect(preview.preTaxCustomerPrice).toBe(12625);
+    expect(preview.taxAmount).toBe(1010);
+    expect(preview.finalCustomerPrice).toBe(13635);
+    expect(preview.monthlyPaymentEstimate).toBe(227.25);
   });
 });

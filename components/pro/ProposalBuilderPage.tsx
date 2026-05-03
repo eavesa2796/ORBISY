@@ -6,6 +6,7 @@ import {
   applyCatalogItemToTierForm,
   buildCatalogEquipmentLabel,
   buildDefaultTierFormsFromSettings,
+  calculateTierFormPricingPreview,
   type BuilderTierForm,
 } from "@/lib/sales/proposals/builder-defaults";
 import {
@@ -1046,6 +1047,10 @@ export default function ProposalsPage() {
             const selectedCatalogItem = tier.equipmentItemId
               ? catalogById.get(tier.equipmentItemId)
               : undefined;
+            const pricingPreview = calculateTierFormPricingPreview(
+              tier,
+              selectedCatalogItem ?? null,
+            );
 
             return (
               <div
@@ -1221,6 +1226,40 @@ export default function ProposalsPage() {
                   placeholder="Warranty"
                   className="rounded-lg border border-[color:var(--border)] bg-black/20 px-3 py-2"
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-2 rounded-lg border border-[color:var(--border)] bg-white/[0.03] p-3 text-xs text-[color:var(--muted)] md:grid-cols-6">
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Customer Price</span>
+                  <br />
+                  {formatCurrency(pricingPreview.finalCustomerPrice)}
+                </p>
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Monthly</span>
+                  <br />
+                  {pricingPreview.monthlyPaymentEstimate
+                    ? `${formatCurrency(pricingPreview.monthlyPaymentEstimate)}/mo`
+                    : "-"}
+                </p>
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Pre-Tax</span>
+                  <br />
+                  {formatCurrency(pricingPreview.preTaxCustomerPrice)}
+                </p>
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Tax</span>
+                  <br />
+                  {formatCurrency(pricingPreview.taxAmount)}
+                </p>
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Gross Margin</span>
+                  <br />
+                  {formatCurrency(pricingPreview.grossMarginAmount)} ({pricingPreview.grossMarginPercent}%)
+                </p>
+                <p>
+                  <span className="font-semibold text-[color:var(--text)]">Total Cost</span>
+                  <br />
+                  {formatCurrency(pricingPreview.totalCost)}
+                </p>
               </div>
               {selectedCatalogItem && (
                 <div className="grid grid-cols-1 gap-2 rounded-lg border border-[color:var(--border)] bg-black/20 p-3 text-xs text-[color:var(--muted)] md:grid-cols-4">
