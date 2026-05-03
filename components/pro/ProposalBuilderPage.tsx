@@ -216,6 +216,8 @@ export default function ProposalsPage() {
   const [markingDeclinedId, setMarkingDeclinedId] = useState<string | null>(null);
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
   const [emailFeedbackByProposal, setEmailFeedbackByProposal] = useState<Record<string, string>>({});
+  const [invitingHomeownerId, setInvitingHomeownerId] = useState<string | null>(null);
+  const [homeownerInviteFeedbackByProposal, setHomeownerInviteFeedbackByProposal] = useState<Record<string, string>>({});
   const [historyFilter, setHistoryFilter] = useState<"ALL" | "ACCEPTED">("ALL");
   const [activeAcceptedProposalId, setActiveAcceptedProposalId] = useState<string | null>(null);
   const [acceptedDetail, setAcceptedDetail] = useState<AcceptedProposalDetail | null>(null);
@@ -466,6 +468,36 @@ export default function ProposalsPage() {
       }));
     } finally {
       setSendingEmailId(null);
+    }
+  }
+
+  async function inviteHomeowner(proposal: InternalProposal) {
+    setInvitingHomeownerId(proposal.id);
+    setHomeownerInviteFeedbackByProposal((prev) => ({ ...prev, [proposal.id]: "" }));
+    try {
+      const res = await fetch(`/api/pro/proposals/${proposal.id}/invite-homeowner`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to invite homeowner");
+
+      const contactLabel = data.invite?.email || proposal.contact?.email || "homeowner";
+      const setupLinkNote = data.setupUrl ? ` Setup link: ${data.setupUrl}` : "";
+      const message = data.alreadyActive
+        ? "Homeowner already has portal access."
+        : `Homeowner portal invite sent to ${contactLabel}.${setupLinkNote}`;
+
+      setHomeownerInviteFeedbackByProposal((prev) => ({
+        ...prev,
+        [proposal.id]: message,
+      }));
+    } catch (error) {
+      setHomeownerInviteFeedbackByProposal((prev) => ({
+        ...prev,
+        [proposal.id]: error instanceof Error ? error.message : "Unexpected error",
+      }));
+    } finally {
+      setInvitingHomeownerId(null);
     }
   }
 
@@ -1598,6 +1630,15 @@ export default function ProposalsPage() {
                   >
                     Copy Print Link
                   </button>
+                  {proposal.contact?.email && (
+                    <button
+                      onClick={() => inviteHomeowner(proposal)}
+                      disabled={invitingHomeownerId === proposal.id}
+                      className="rounded-lg border border-sky-300 px-4 py-2 text-sm font-semibold text-sky-600 disabled:opacity-60"
+                    >
+                      {invitingHomeownerId === proposal.id ? "Sending invite..." : "Invite Homeowner"}
+                    </button>
+                  )}
                   <a
                     href={proposal.publicUrl}
                     target="_blank"
@@ -1630,6 +1671,9 @@ export default function ProposalsPage() {
 
                 {emailFeedbackByProposal[proposal.id] && (
                   <p className="text-sm text-[color:var(--muted)]">{emailFeedbackByProposal[proposal.id]}</p>
+                )}
+                {homeownerInviteFeedbackByProposal[proposal.id] && (
+                  <p className="text-sm text-[color:var(--muted)]">{homeownerInviteFeedbackByProposal[proposal.id]}</p>
                 )}
               </div>
             ))}
